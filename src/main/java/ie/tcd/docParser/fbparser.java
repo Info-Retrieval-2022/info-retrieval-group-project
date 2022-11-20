@@ -1,8 +1,9 @@
-package ie.tcd.dalyc24;
+package ie.tcd.docParser;
 
 import java.io.IOException;
 
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -26,43 +27,10 @@ import java.io.File;
  
 public class fbparser
 {
-    
-    private static String INDEX_DIRECTORY = "../index";
-
-    public static void main(String[] args) throws IOException
-    {
-        Analyzer analyzer;
-        Scanner sc= new Scanner(System.in);
-        System.out.println("Analyzers - 1: Standard 2: Stop 3: WhiteSpace 4: English");
-        String choice = sc.next();
-        choice = choice.trim(); 
-        if(choice.equals("1")){
-            analyzer = new StandardAnalyzer();
-        }
-        else if(choice.equals("2")){
-            analyzer = new StopAnalyzer();
-        }
-        else if(choice.equals("3")){
-            analyzer = new WhitespaceAnalyzer();
-        }
-        else if(choice.equals("4")){
-            analyzer = new EnglishAnalyzer();
-        }
-        else{
-            System.out.println(choice+" Invalid Choice" );
-            return;
-        }
-        
-        Directory directory = FSDirectory.open(Paths.get(INDEX_DIRECTORY));
-        
-        IndexWriterConfig config = new IndexWriterConfig(analyzer);
-
-        config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
-        
-        IndexWriter iwriter = new IndexWriter(directory, config); 
-        
+    public static ArrayList<Document> parsefb(String input) throws IOException {
+    	ArrayList<Document> doclist = new ArrayList<>();
 		int Fcnt = 0;
-		File dir = new File("../fbis");
+		File dir = new File(input);
 		File[] directoryListing = dir.listFiles();
 			for (File child : directoryListing) {
 				if((child.getName()).startsWith("fb")){
@@ -81,7 +49,7 @@ public class fbparser
 
 					// System.out.println(link.getElementsByTag("DOCNO").text() +"\n");
 					String id = link.getElementsByTag("DOCNO").text();
-					document.add(new TextField("id", id, Field.Store.YES));
+					document.add(new TextField("docno", id, Field.Store.YES));
 
 					// System.out.println(link.getElementsByTag("DATE1").text()+"\n");
 					String date = link.getElementsByTag("DATE1").text();
@@ -97,23 +65,14 @@ public class fbparser
 
 					// System.out.println(link.getElementsByAttributeValue("P", "104").text()+"\n");
 					String pub = link.getElementsByAttributeValue("P", "104").text();
-					document.add(new TextField("publication", pub, Field.Store.YES));
-
-					// System.out.println("-----------");
-					iwriter.addDocument(document);
-
+					document.add(new TextField("pub", pub, Field.Store.YES));
+					doclist.add(document);
 					++Icnt;
 
 				}
-
 				System.out.println(child.getName()+ " Docnos "+Integer.toString(Icnt));
-
 			}
-
 		}
-
-        
-        iwriter.close();
-        directory.close();
+		return doclist;
     }
 }

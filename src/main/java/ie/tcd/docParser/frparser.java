@@ -1,4 +1,4 @@
-package tcd.odonneb4;
+package ie.tcd.docParser;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -40,18 +40,13 @@ public class frparser {
                     SUMMARY_Str = element.select("SUMMARY").text();
                     DATE_Str = element.select("DATE").text();
                     AGENCY_Str = element.select("AGENCY").text();
+                    System.out.println("reading file: " + DOCNO_Str);
                     Document document = new Document();
-                    System.out.println(DOCNO_Str);
-                    System.out.println(ACTION_Str);
-                    System.out.println(SUMMARY_Str);
-                    System.out.println(DATE_Str);
-                    System.out.println(AGENCY_Str);
-
-                    document.add(new StringField("DOCNO", DOCNO_Str, Field.Store.YES));
-                    document.add(new TextField("Date", DATE_Str, Field.Store.YES));
-                    document.add(new TextField("Headline", ACTION_Str, Field.Store.YES));
-                    document.add(new TextField("Text", SUMMARY_Str, Field.Store.YES));
-                    document.add(new TextField("Publication", AGENCY_Str, Field.Store.YES));
+                    document.add(new StringField("docno", DOCNO_Str, Field.Store.YES));
+                    document.add(new TextField("date", DATE_Str, Field.Store.YES));
+                    document.add(new TextField("headline", ACTION_Str, Field.Store.YES));
+                    document.add(new TextField("text", SUMMARY_Str, Field.Store.YES));
+                    document.add(new TextField("pub", AGENCY_Str, Field.Store.YES));
                     doclist.add(document);
                 }
             }

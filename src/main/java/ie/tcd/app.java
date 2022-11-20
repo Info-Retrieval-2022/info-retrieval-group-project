@@ -33,10 +33,19 @@ public class app {
     public static void main(String[] args) throws IOException {
 
         try {
-        	// create documents use latimes 
-			ArrayList<Document> la_docs = latimes_parser.loadLaTimesDocs("D:\\tcd\\CS7IS3_Information_Retrieval_and_Web_Search\\assignment2\\Assignment Two_Documents\\Assignment_Two\\latimes");
-		
-			create_index(la_docs);
+			ArrayList<Document> fr_docs = frparser.parseFR94("C:/myProjects/eclipse/Assignment Two/Assignment Two/fr94");			
+			ArrayList<Document> la_docs = latimes_parser.loadLaTimesDocs("G:/My Drive/1 Masters/Information Retrieval & Web Search/Assignments/Group 12/Assignment Two/Assignment Two/latimes/");
+			ArrayList<Document> ft_docs = ftLoader.parseFT("G:/My Drive/1 Masters/Information Retrieval & Web Search/Assignments/Group 12/Assignment Two/Assignment Two/ft/");
+			ArrayList<Document> fb_docs = fbparser.parsefb("G:/My Drive/1 Masters/Information Retrieval & Web Search/Assignments/Group 12/Assignment Two/Assignment Two/fbis/");
+			
+			ArrayList<Document> all_docs = new ArrayList<Document>();
+			
+			all_docs.addAll(la_docs);
+			all_docs.addAll(fr_docs);
+			all_docs.addAll(ft_docs);
+			all_docs.addAll(fb_docs);
+			
+			create_index(all_docs);
 			
 			do_query();
 			

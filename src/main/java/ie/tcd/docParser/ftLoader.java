@@ -1,4 +1,4 @@
-package App.Loader;
+package ie.tcd.docParser;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
@@ -41,8 +41,8 @@ public class ftLoader {
                     doc.add(new StringField("date", date, Field.Store.YES));
                     doc.add(new TextField("headline", headline, Field.Store.YES));
                     doc.add(new TextField("pub", pub, Field.Store.YES));
-                    doc.add(new TextField("dateline", dateline, Field.Store.YES));
-                    doc.add(new TextField("byline", byline, Field.Store.YES));
+          //          doc.add(new TextField("dateline", dateline, Field.Store.YES));
+          //          doc.add(new TextField("byline", byline, Field.Store.YES));
                     doc.add(new TextField("text", text, Field.Store.YES));
                     doclist.add(doc);
                 }
@@ -50,9 +50,5 @@ public class ftLoader {
         }
         System.out.println("Parsing FT done...");
         return doclist;
-    }
-
-    public static void main(String[] args) throws IOException {
-        ArrayList<Document> a = parseFT("Documents/ft/");
     }
 }
