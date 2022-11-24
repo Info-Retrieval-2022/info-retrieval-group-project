@@ -1,4 +1,4 @@
-package org.example;
+package ie.tcd;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.core.SimpleAnalyzer;
@@ -26,13 +26,13 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import org.example.docParser.*;
+import ie.tcd.docParser.*;
 
 /**
  * Hello world!
  *
  */
-public class App {
+public class app {
 
     private static String INDEX_DIRECTORY = "../index";
 
@@ -301,7 +301,7 @@ public class App {
             config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
 
             ArrayList<Document> fr_docs = frparser.parseFR94("C:\\masters\\CS7IS3\\assignment_2\\Assignment Two\\fr94\\");
-            ArrayList<Document> la_docs = laTimes_parser.loadLaTimesDocs("C:\\masters\\CS7IS3\\assignment_2\\Assignment Two\\latimes\\");
+            ArrayList<Document> la_docs = latimes_parser.loadLaTimesDocs("C:\\masters\\CS7IS3\\assignment_2\\Assignment Two\\latimes\\");
             ArrayList<Document> ft_docs = ftLoader.parseFT("C:\\masters\\CS7IS3\\assignment_2\\Assignment Two\\ft\\");
             ArrayList<Document> fb_docs = fbparser.parsefb("C:\\masters\\CS7IS3\\assignment_2\\Assignment Two\\fbis\\");
 
