@@ -300,10 +300,10 @@ public class app {
             iSearcher.setSimilarity(bm25Similarity);
             config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
 
-            ArrayList<Document> fr_docs = frparser.parseFR94("C:\\masters\\CS7IS3\\assignment_2\\Assignment Two\\fr94\\");
-            ArrayList<Document> la_docs = latimes_parser.loadLaTimesDocs("C:\\masters\\CS7IS3\\assignment_2\\Assignment Two\\latimes\\");
-            ArrayList<Document> ft_docs = ftLoader.parseFT("C:\\masters\\CS7IS3\\assignment_2\\Assignment Two\\ft\\");
-            ArrayList<Document> fb_docs = fbparser.parsefb("C:\\masters\\CS7IS3\\assignment_2\\Assignment Two\\fbis\\");
+            ArrayList<Document> fr_docs = frparser.parseFR94("../Assignment Two/fr94");
+            ArrayList<Document> la_docs = latimes_parser.loadLaTimesDocs("../Assignment Two/latimes");
+            ArrayList<Document> ft_docs = ftLoader.parseFT("../Assignment Two/ft");
+            ArrayList<Document> fb_docs = fbparser.parsefb("../Assignment Two/fbis");
 
             ArrayList<Document> all_docs = new ArrayList<Document>();
 
@@ -314,7 +314,7 @@ public class app {
 
             create_index(all_docs);
 
-            File file = new File("C:\\masters\\CS7IS3\\assignment_2\\topics");
+            File file = new File("../topics");
             ArrayList<BooleanQuery> queries = createQueries(file);
             ArrayList<ScoreDoc[]> hits = getHits(iSearcher,queries);
             getResults(hits, iSearcher, name + "test.txt");
