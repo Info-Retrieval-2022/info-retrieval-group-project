@@ -1,5 +1,5 @@
-/home/azureuser/group/info-retrieval-group-project/src/main/java/ie/tcd/app.java
-/home/azureuser/group/info-retrieval-group-project/src/main/java/ie/tcd/docParser/frparser.java
-/home/azureuser/group/info-retrieval-group-project/src/main/java/ie/tcd/docParser/ftLoader.java
-/home/azureuser/group/info-retrieval-group-project/src/main/java/ie/tcd/docParser/fbparser.java
-/home/azureuser/group/info-retrieval-group-project/src/main/java/ie/tcd/docParser/latimes_parser.java
+/assignment2/info-retrieval-group-project/src/main/java/ie/tcd/docParser/fbparser.java
+/assignment2/info-retrieval-group-project/src/main/java/ie/tcd/docParser/frparser.java
+/assignment2/info-retrieval-group-project/src/main/java/ie/tcd/docParser/latimes_parser.java
+/assignment2/info-retrieval-group-project/src/main/java/ie/tcd/app.java
+/assignment2/info-retrieval-group-project/src/main/java/ie/tcd/docParser/ftLoader.java
