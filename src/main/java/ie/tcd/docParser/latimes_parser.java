@@ -4,6 +4,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
+import org.apache.lucene.index.IndexWriter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 
 public class latimes_parser {
 
-    public static ArrayList<Document> loadLaTimesDocs(String pathToLADocs) throws IOException {
+    public static ArrayList<Document> loadLaTimesDocs(String pathToLADocs, IndexWriter iwriter) throws IOException {
         System.out.println("Loading LATIMES ...");
         ArrayList<Document> laDocs = new ArrayList<>();
 
@@ -34,7 +35,8 @@ public class latimes_parser {
                 date = (doc.select("Date").select("P").text());
                 headline = (doc.select("HEADLINE").select("P").text());
                 text = (doc.select("TEXT").select("P").text());
-                laDocs.add(createDocument(docNo, date, headline, text));
+              //  laDocs.add(createDocument(docNo, date, headline, text));
+                iwriter.addDocument(createDocument(docNo, date, headline, text));
             }
         }
         System.out.println("Loading LATIMES Done!");

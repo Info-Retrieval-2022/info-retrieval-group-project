@@ -4,6 +4,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
+import org.apache.lucene.index.IndexWriter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 public class ftLoader {
     private static ArrayList<Document> doclist;
 
-    public static ArrayList<Document> parseFT(String path) throws IOException {
+    public static ArrayList<Document> parseFT(String path, IndexWriter iwriter) throws IOException {
         System.out.println("Parsing ft...");
         String docno, byline, text, date, headline, pub, dateline;
         doclist = new ArrayList<>();
@@ -44,7 +45,8 @@ public class ftLoader {
           //          doc.add(new TextField("dateline", dateline, Field.Store.YES));
           //          doc.add(new TextField("byline", byline, Field.Store.YES));
                     doc.add(new TextField("text", text, Field.Store.YES));
-                    doclist.add(doc);
+                    iwriter.addDocument(doc);
+                //    doclist.add(doc);
                 }
             }
         }

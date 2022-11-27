@@ -4,6 +4,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
+import org.apache.lucene.index.IndexWriter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
@@ -16,7 +17,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 
 public class frparser {
-    public static ArrayList<Document> parseFR94(String path) throws IOException {
+    public static ArrayList<Document> parseFR94(String path, IndexWriter iwriter) throws IOException {
     	ArrayList<Document> doclist = new ArrayList<>();
         System.out.println("Parsing fr94 documents...");
         File[] directories = new File(path).listFiles(File::isDirectory);
@@ -47,7 +48,8 @@ public class frparser {
                     document.add(new TextField("headline", ACTION_Str, Field.Store.YES));
                     document.add(new TextField("text", SUMMARY_Str, Field.Store.YES));
                     document.add(new TextField("pub", AGENCY_Str, Field.Store.YES));
-                    doclist.add(document);
+                    //doclist.add(document);
+                	iwriter.addDocument(document);
                 }
             }
         }

@@ -40,6 +40,7 @@ public class app {
     private static int MAX_RESULTS = 10;
 
 
+
     private static void create_index(ArrayList<Document> docs) {
         try {
             // Analyzer that is used to process TextField
@@ -290,34 +291,30 @@ public class app {
     public static void main(String[] args) throws IOException {
 
         try {
+        	
             Analyzer analyzer = new StandardAnalyzer();
             IndexWriterConfig config = new IndexWriterConfig(analyzer);
             BM25Similarity bm25Similarity = new BM25Similarity();
             String name = "BM25";
             config.setSimilarity(bm25Similarity);
-            
             config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
+            
+            Directory directory = FSDirectory.open(Paths.get(INDEX_DIRECTORY));
+            IndexWriter iwriter = new IndexWriter(directory, config);
+            
             System.out.println("PWD: " + System.getProperty("user.dir"));
             
-            ArrayList<Document> fr_docs = frparser.parseFR94("./Assignment Two/fr94");
-            ArrayList<Document> la_docs = latimes_parser.loadLaTimesDocs("./Assignment Two/latimes");
-            ArrayList<Document> ft_docs = ftLoader.parseFT("./Assignment Two/ft");
-            ArrayList<Document> fb_docs = fbparser.parsefb("./Assignment Two/fbis");
-
-            ArrayList<Document> all_docs = new ArrayList<Document>();
-
-            all_docs.addAll(la_docs);
-            all_docs.addAll(fr_docs);
-            all_docs.addAll(ft_docs);
-            all_docs.addAll(fb_docs);
-
-            create_index(all_docs);
-
+            frparser.parseFR94("./Assignment Two/fr94", iwriter);
+            latimes_parser.loadLaTimesDocs("./Assignment Two/latimes", iwriter);  
+            ftLoader.parseFT("./Assignment Two/ft", iwriter);  
+            fbparser.parsefb("./Assignment Two/fbis", iwriter); 
+            iwriter.close();
+            
+            
             File file = new File("./topics");
             ArrayList<BooleanQuery> queries = createQueries(file);
             
             // do a search if and only if indexes created successfully. 
-            Directory directory = FSDirectory.open(Paths.get(INDEX_DIRECTORY));
             DirectoryReader dReader = DirectoryReader.open(directory);
             IndexSearcher iSearcher = new IndexSearcher(dReader);
             iSearcher.setSimilarity(bm25Similarity);

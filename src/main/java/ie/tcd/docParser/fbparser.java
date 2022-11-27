@@ -28,7 +28,7 @@ import java.io.File;
  
 public class fbparser
 {
-    public static ArrayList<Document> parsefb(String input) throws IOException {
+    public static ArrayList<Document> parsefb(String input, IndexWriter iwriter) throws IOException {
     	ArrayList<Document> doclist = new ArrayList<>();
 		int Fcnt = 0;
 		File dir = new File(input);
@@ -67,7 +67,8 @@ public class fbparser
 					// System.out.println(link.getElementsByAttributeValue("P", "104").text()+"\n");
 					String pub = link.getElementsByAttributeValue("P", "104").text();
 					document.add(new TextField("pub", pub, Field.Store.YES));
-					doclist.add(document);
+				//	doclist.add(document);
+					iwriter.addDocument(document);
 					++Icnt;
 
 				}
