@@ -63,6 +63,8 @@ public class app {
 
         }
         catch (Exception e) {
+            System.out.println(e.getMessage());
+            
 
         }
     }
@@ -106,7 +108,7 @@ public class app {
             directory.close();
         }
         catch (Exception e) {
-
+        	   System.out.println(e.getMessage());
         }
     }
 
@@ -289,21 +291,18 @@ public class app {
 
         try {
             Analyzer analyzer = new StandardAnalyzer();
-
-            Directory directory = FSDirectory.open(Paths.get(INDEX_DIRECTORY));
-            DirectoryReader dReader = DirectoryReader.open(directory);
-            IndexSearcher iSearcher = new IndexSearcher(dReader);
             IndexWriterConfig config = new IndexWriterConfig(analyzer);
             BM25Similarity bm25Similarity = new BM25Similarity();
             String name = "BM25";
             config.setSimilarity(bm25Similarity);
-            iSearcher.setSimilarity(bm25Similarity);
+            
             config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
-
-            ArrayList<Document> fr_docs = frparser.parseFR94("../Assignment Two/fr94");
-            ArrayList<Document> la_docs = latimes_parser.loadLaTimesDocs("../Assignment Two/latimes");
-            ArrayList<Document> ft_docs = ftLoader.parseFT("../Assignment Two/ft");
-            ArrayList<Document> fb_docs = fbparser.parsefb("../Assignment Two/fbis");
+            System.out.println("PWD: " + System.getProperty("user.dir"));
+            
+            ArrayList<Document> fr_docs = frparser.parseFR94("./Assignment Two/fr94");
+            ArrayList<Document> la_docs = latimes_parser.loadLaTimesDocs("./Assignment Two/latimes");
+            ArrayList<Document> ft_docs = ftLoader.parseFT("./Assignment Two/ft");
+            ArrayList<Document> fb_docs = fbparser.parsefb("./Assignment Two/fbis");
 
             ArrayList<Document> all_docs = new ArrayList<Document>();
 
@@ -314,12 +313,18 @@ public class app {
 
             create_index(all_docs);
 
-            File file = new File("../topics");
+            File file = new File("./topics");
             ArrayList<BooleanQuery> queries = createQueries(file);
+            
+            // do a search if and only if indexes created successfully. 
+            Directory directory = FSDirectory.open(Paths.get(INDEX_DIRECTORY));
+            DirectoryReader dReader = DirectoryReader.open(directory);
+            IndexSearcher iSearcher = new IndexSearcher(dReader);
+            iSearcher.setSimilarity(bm25Similarity);
             ArrayList<ScoreDoc[]> hits = getHits(iSearcher,queries);
             getResults(hits, iSearcher, name + "test.txt");
             directory.close();
-            //do_query();
+       //     do_query();
 
         } catch (Exception e) {
             // TODO Auto-generated catch block

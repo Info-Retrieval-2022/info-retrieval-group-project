@@ -10,6 +10,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
+import org.apache.lucene.document.StringField;
 import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
@@ -49,9 +50,9 @@ public class fbparser
 
 					// System.out.println(link.getElementsByTag("DOCNO").text() +"\n");
 					String id = link.getElementsByTag("DOCNO").text();
-					document.add(new TextField("docno", id, Field.Store.YES));
+					document.add(new StringField("docno", id, Field.Store.YES));
 
-					// System.out.println(link.getElementsByTag("DATE1").text()+"\n");
+					//System.out.println(link.getElementsByTag("DATE1").text()+"\n");
 					String date = link.getElementsByTag("DATE1").text();
 					document.add(new TextField("date", date, Field.Store.YES));
 
