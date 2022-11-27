@@ -150,7 +150,7 @@ public class app {
             for (int j = 0; j < hits.get(i).length; j++) {
                 int docId = hits.get(i)[j].doc;
                 Document d = iSearcher.doc(docId);
-                printWriter.print((i + 1) + " 0 " + d.get("docno") + " " + c + " " + hits.get(i)[j].score + " STANDARD " + '\n');
+                printWriter.print((i + 401) + " 0 " + d.get("docno") + " " + c + " " + hits.get(i)[j].score + " STANDARD " + '\n');
                 c++;
             }
         }
