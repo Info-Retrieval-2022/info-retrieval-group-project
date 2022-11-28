@@ -127,8 +127,8 @@ public class app {
             // String queryStr = title.toString()+" "+narr.toString();
             
             Map<String, Float> boost = new HashMap<>();
-            boost.put("headline", (float) 0.2);
-            boost.put("text", (float) 0.8);
+            boost.put("headline", (float) 0.1);
+            boost.put("text", (float) 0.9);
 //            boost.put("headline", (float) 0.5);
 //            boost.put("text", (float) 0.5);
 
@@ -148,8 +148,8 @@ public class app {
     public static void main(String[] args) throws IOException {
 
         try {
-        	Analyzer analyzer = new EnglishAnalyzer(EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);
-//            Analyzer analyzer = new StandardAnalyzer();
+//        	Analyzer analyzer = new EnglishAnalyzer(EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);
+            Analyzer analyzer = new StandardAnalyzer();
             IndexWriterConfig config = new IndexWriterConfig(analyzer);
             
             BM25Similarity bm25Similarity = new BM25Similarity();
