@@ -127,10 +127,10 @@ public class app {
             // String queryStr = desc.toString()+" "+narr.toString();
             
             Map<String, Float> boost = new HashMap<>();
-            boost.put("headline", (float) 0.1);
-            boost.put("text", (float) 0.9);
-     //       boost.put("headline", (float) 0.5);
-     //       boost.put("text", (float) 0.5);
+//            boost.put("headline", (float) 0.1);
+//            boost.put("text", (float) 0.9);
+            boost.put("headline", (float) 0.5);
+            boost.put("text", (float) 0.5);
 
             queryStr = queryStr.replace("/", "\\/");
             MultiFieldQueryParser queryParser = new MultiFieldQueryParser(new String[]{"headline", "text"}, analyzer, boost);
@@ -156,7 +156,7 @@ public class app {
             String name = "BM25";
             LMDirichletSimilarity LMDirichlet = new LMDirichletSimilarity();
             MultiSimilarity combined = new MultiSimilarity(new Similarity[]{bm25Similarity, LMDirichlet});
-            name = "combined retrieval model";
+            name = "combined";
             config.setSimilarity(combined);
             config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
             
