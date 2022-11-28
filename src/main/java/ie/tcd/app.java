@@ -176,7 +176,7 @@ public class app {
 //            // do a search if and only if indexes created successfully. 
             DirectoryReader dReader = DirectoryReader.open(directory);
             IndexSearcher iSearcher = new IndexSearcher(dReader);
-            iSearcher.setSimilarity(bm25Similarity);
+            iSearcher.setSimilarity(combined);
             ArrayList<ScoreDoc[]> hits = getHits(iSearcher,queries);
             getResults(hits, iSearcher, name + "test.txt");
             directory.close();
