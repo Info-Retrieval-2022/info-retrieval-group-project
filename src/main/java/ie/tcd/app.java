@@ -127,8 +127,8 @@ public class app {
             // String queryStr = title.toString()+" "+narr.toString();
             
             Map<String, Float> boost = new HashMap<>();
-            boost.put("headline", (float) 0.1);
-            boost.put("text", (float) 0.9);
+            boost.put("headline", (float) 0.9);
+            boost.put("text", (float) 0.1);
 //            boost.put("headline", (float) 0.5);
 //            boost.put("text", (float) 0.5);
 
@@ -155,9 +155,9 @@ public class app {
             BM25Similarity bm25Similarity = new BM25Similarity();
             String name = "BM25";
             LMDirichletSimilarity LMDirichlet = new LMDirichletSimilarity();
-            BooleanSimilarity booleanSim = new BooleanSimilarity();
-            MultiSimilarity combined = new MultiSimilarity(new Similarity[]{bm25Similarity, LMDirichlet,booleanSim});
-            name = "combined_boolean";
+//            BooleanSimilarity booleanSim = new BooleanSimilarity();
+            MultiSimilarity combined = new MultiSimilarity(new Similarity[]{bm25Similarity, LMDirichlet});
+            name = "combined";
             config.setSimilarity(combined);
             config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
             
