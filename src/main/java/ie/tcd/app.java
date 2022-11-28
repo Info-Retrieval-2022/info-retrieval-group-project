@@ -122,15 +122,15 @@ public class app {
             }
             title = title.delete(0,8);
             num = num.delete(0,15);
-            String queryStr = title.toString()+" "+desc.toString()+" "+narr.toString();
-            // String queryStr = title.toString();
+            // String queryStr = title.toString()+" "+desc.toString()+" "+narr.toString();
+            String queryStr = title.toString();
             // String queryStr = desc.toString()+" "+narr.toString();
             
             Map<String, Float> boost = new HashMap<>();
-//            boost.put("headline", (float) 0.1);
-//            boost.put("text", (float) 0.9);
-            boost.put("headline", (float) 0.5);
-            boost.put("text", (float) 0.5);
+            boost.put("headline", (float) 0.1);
+            boost.put("text", (float) 0.9);
+//            boost.put("headline", (float) 0.5);
+//            boost.put("text", (float) 0.5);
 
             queryStr = queryStr.replace("/", "\\/");
             MultiFieldQueryParser queryParser = new MultiFieldQueryParser(new String[]{"headline", "text"}, analyzer, boost);
