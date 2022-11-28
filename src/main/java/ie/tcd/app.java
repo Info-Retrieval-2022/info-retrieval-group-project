@@ -131,13 +131,13 @@ public class app {
             title = title.delete(0,8);
             num = num.delete(0,15);
 			/* Run 1 */
-            // String queryStr = title.toString()+" "+desc.toString()+" "+narr.toString();
+            String queryStr = title.toString()+" "+desc.toString()+" "+narr.toString();
             /* Run 2 */
-            String queryStr = title.toString()+" "+narr.toString();
+            // String queryStr = title.toString()+" "+narr.toString();
             
             Map<String, Float> boost = new HashMap<>();
-            boost.put("headline", (float) 1);
-            boost.put("text", (float) 5);
+            boost.put("headline", (float) 0.1);
+            boost.put("text", (float) 0.9);
 
             queryStr = queryStr.replace("/", "\\/");
             MultiFieldQueryParser queryParser = new MultiFieldQueryParser(new String[]{"headline", "text"}, analyzer, boost);
@@ -156,19 +156,19 @@ public class app {
 
         try {
         	/* Run 1 */
-//        	Analyzer analyzer = new EnglishAnalyzer(EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);
+        	Analyzer analyzer = new EnglishAnalyzer(EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);
         	/* Run 2 */
-        	Analyzer analyzer = new StandardAnalyzer();
+//       	Analyzer analyzer = new StandardAnalyzer();
             IndexWriterConfig config = new IndexWriterConfig(analyzer);
             
             /* Run 1 */
             BM25Similarity bm25Similarity = new BM25Similarity();
             String name = "BM25";
+//          config.setSimilarity(bm25Similarity);
             /* Run 2 */
             LMDirichletSimilarity LMDirichlet = new LMDirichletSimilarity();
             MultiSimilarity combined = new MultiSimilarity(new Similarity[]{bm25Similarity, LMDirichlet});
             name = "combined";
-//          config.setSimilarity(bm25Similarity);
             config.setSimilarity(combined);
             config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
             
