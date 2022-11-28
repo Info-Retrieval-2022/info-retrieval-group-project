@@ -123,8 +123,8 @@ public class app {
             title = title.delete(0,8);
             num = num.delete(0,15);
             // String queryStr = title.toString()+" "+desc.toString()+" "+narr.toString();
-            String queryStr = title.toString();
-            // String queryStr = desc.toString()+" "+narr.toString();
+            // String queryStr = title.toString();
+            String queryStr = desc.toString()+" "+narr.toString();
             
             Map<String, Float> boost = new HashMap<>();
             boost.put("headline", (float) 0.1);
