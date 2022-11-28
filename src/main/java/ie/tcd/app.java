@@ -16,7 +16,11 @@ import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.*;
 import org.apache.lucene.search.similarities.BM25Similarity;
+import org.apache.lucene.search.similarities.BooleanSimilarity;
 import org.apache.lucene.search.similarities.ClassicSimilarity;
+import org.apache.lucene.search.similarities.LMDirichletSimilarity;
+import org.apache.lucene.search.similarities.MultiSimilarity;
+import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
@@ -39,7 +43,7 @@ import ie.tcd.docParser.*;
  */
 public class app {
 
-    private static String INDEX_DIRECTORY = "../index";
+    private static String INDEX_DIRECTORY = "index";
 
     static ScoreDoc[] queryIndex(int idx, ArrayList<BooleanQuery> queries, int num_hits, IndexSearcher iSearcher) throws IOException, ParseException {
         Directory directory = FSDirectory.open(Paths.get(INDEX_DIRECTORY));
@@ -81,6 +85,13 @@ public class app {
         myWriter.close();
     }
 
+    /**
+     * @param file
+     * @param analyzer
+     * @return
+     * @throws IOException
+     * @throws org.apache.lucene.queryparser.classic.ParseException
+     */
     public static ArrayList<BooleanQuery> createQueries(File file, Analyzer analyzer) throws IOException, org.apache.lucene.queryparser.classic.ParseException {
         ArrayList<BooleanQuery> queries = new ArrayList<>();
         BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -119,8 +130,11 @@ public class app {
             }
             title = title.delete(0,8);
             num = num.delete(0,15);
+			/* Run 1 */
             String queryStr = title.toString()+" "+desc.toString()+" "+narr.toString();
-
+            /* Run 2 */
+            // String queryStr = title.toString()+" "+narr.toString();
+            
             Map<String, Float> boost = new HashMap<>();
             boost.put("headline", (float) 0.1);
             boost.put("text", (float) 0.9);
@@ -141,16 +155,21 @@ public class app {
     public static void main(String[] args) throws IOException {
 
         try {
-//          StandardAnalyzer analyzer = new StandardAnalyzer();
-//        	WhitespaceAnalyzer whitespaceAnalyzer = new WhitespaceAnalyzer();
-//          SimpleAnalyzer simpleAnalyzer = new SimpleAnalyzer();
-//        	Analyzer english = new EnglishAnalyzer(EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);
-            Analyzer analyzer = new StandardAnalyzer();
+        	/* Run 1 */
+        	Analyzer analyzer = new EnglishAnalyzer(EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);
+        	/* Run 2 */
+//       	Analyzer analyzer = new StandardAnalyzer();
             IndexWriterConfig config = new IndexWriterConfig(analyzer);
             
+            /* Run 1 */
             BM25Similarity bm25Similarity = new BM25Similarity();
             String name = "BM25";
-            config.setSimilarity(bm25Similarity);
+//          config.setSimilarity(bm25Similarity);
+            /* Run 2 */
+            LMDirichletSimilarity LMDirichlet = new LMDirichletSimilarity();
+            MultiSimilarity combined = new MultiSimilarity(new Similarity[]{bm25Similarity, LMDirichlet});
+            name = "combined";
+            config.setSimilarity(combined);
             config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
             
             Directory directory = FSDirectory.open(Paths.get(INDEX_DIRECTORY));
@@ -166,11 +185,10 @@ public class app {
             
             File file = new File("./topics");
             ArrayList<BooleanQuery> queries = createQueries(file, analyzer);
-            System.out.println(queries);
-//            // do a search if and only if indexes created successfully. 
+//          do a search if and only if indexes created successfully. 
             DirectoryReader dReader = DirectoryReader.open(directory);
             IndexSearcher iSearcher = new IndexSearcher(dReader);
-            iSearcher.setSimilarity(bm25Similarity);
+            iSearcher.setSimilarity(combined);
             ArrayList<ScoreDoc[]> hits = getHits(iSearcher,queries);
             getResults(hits, iSearcher, name + "test.txt");
             directory.close();
