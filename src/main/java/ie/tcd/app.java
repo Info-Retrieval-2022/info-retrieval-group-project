@@ -154,10 +154,10 @@ public class app {
             
             BM25Similarity bm25Similarity = new BM25Similarity();
             String name = "BM25";
-            //      LMDirichletSimilarity LMDirichlet = new LMDirichletSimilarity();
-            //      MultiSimilarity combined = new MultiSimilarity(new Similarity[]{bm25Similarity, LMDirichlet});
-            //      String name = "combined retrieval model";
-            config.setSimilarity(bm25Similarity);
+            LMDirichletSimilarity LMDirichlet = new LMDirichletSimilarity();
+            MultiSimilarity combined = new MultiSimilarity(new Similarity[]{bm25Similarity, LMDirichlet});
+            name = "combined retrieval model";
+            config.setSimilarity(combined);
             config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
             
             Directory directory = FSDirectory.open(Paths.get(INDEX_DIRECTORY));
