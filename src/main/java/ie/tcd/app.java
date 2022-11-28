@@ -17,6 +17,9 @@ import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.*;
 import org.apache.lucene.search.similarities.BM25Similarity;
 import org.apache.lucene.search.similarities.ClassicSimilarity;
+import org.apache.lucene.search.similarities.LMDirichletSimilarity;
+import org.apache.lucene.search.similarities.MultiSimilarity;
+import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSDirectory;
 
@@ -120,10 +123,14 @@ public class app {
             title = title.delete(0,8);
             num = num.delete(0,15);
             String queryStr = title.toString()+" "+desc.toString()+" "+narr.toString();
-
+            // String queryStr = title.toString();
+            // String queryStr = desc.toString()+" "+narr.toString();
+            
             Map<String, Float> boost = new HashMap<>();
             boost.put("headline", (float) 0.1);
             boost.put("text", (float) 0.9);
+     //       boost.put("headline", (float) 0.5);
+     //       boost.put("text", (float) 0.5);
 
             queryStr = queryStr.replace("/", "\\/");
             MultiFieldQueryParser queryParser = new MultiFieldQueryParser(new String[]{"headline", "text"}, analyzer, boost);
@@ -141,15 +148,15 @@ public class app {
     public static void main(String[] args) throws IOException {
 
         try {
-//          StandardAnalyzer analyzer = new StandardAnalyzer();
-//        	WhitespaceAnalyzer whitespaceAnalyzer = new WhitespaceAnalyzer();
-//          SimpleAnalyzer simpleAnalyzer = new SimpleAnalyzer();
         	Analyzer analyzer = new EnglishAnalyzer(EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);
 //            Analyzer analyzer = new StandardAnalyzer();
             IndexWriterConfig config = new IndexWriterConfig(analyzer);
             
             BM25Similarity bm25Similarity = new BM25Similarity();
             String name = "BM25";
+            //      LMDirichletSimilarity LMDirichlet = new LMDirichletSimilarity();
+            //      MultiSimilarity combined = new MultiSimilarity(new Similarity[]{bm25Similarity, LMDirichlet});
+            //      String name = "combined retrieval model";
             config.setSimilarity(bm25Similarity);
             config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
             
@@ -166,7 +173,6 @@ public class app {
             
             File file = new File("./topics");
             ArrayList<BooleanQuery> queries = createQueries(file, analyzer);
-            System.out.println(queries);
 //            // do a search if and only if indexes created successfully. 
             DirectoryReader dReader = DirectoryReader.open(directory);
             IndexSearcher iSearcher = new IndexSearcher(dReader);
