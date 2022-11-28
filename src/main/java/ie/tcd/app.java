@@ -42,7 +42,7 @@ import ie.tcd.docParser.*;
  */
 public class app {
 
-    private static String INDEX_DIRECTORY = "../index";
+    private static String INDEX_DIRECTORY = "index";
 
     static ScoreDoc[] queryIndex(int idx, ArrayList<BooleanQuery> queries, int num_hits, IndexSearcher iSearcher) throws IOException, ParseException {
         Directory directory = FSDirectory.open(Paths.get(INDEX_DIRECTORY));
@@ -125,7 +125,7 @@ public class app {
             // String queryStr = title.toString()+" "+desc.toString()+" "+narr.toString();
             // String queryStr = title.toString();
             // String queryStr = desc.toString()+" "+narr.toString();
-            String queryStr = narr.toString();
+            String queryStr = title.toString()+" "+desc.toString();
             
             Map<String, Float> boost = new HashMap<>();
             boost.put("headline", (float) 0.1);
