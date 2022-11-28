@@ -125,7 +125,7 @@ public class app {
             // String queryStr = title.toString()+" "+desc.toString()+" "+narr.toString();
             // String queryStr = title.toString();
             // String queryStr = desc.toString()+" "+narr.toString();
-            String queryStr = desc.toString();
+            String queryStr = narr.toString();
             
             Map<String, Float> boost = new HashMap<>();
             boost.put("headline", (float) 0.1);
