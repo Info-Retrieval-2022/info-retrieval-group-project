@@ -85,6 +85,13 @@ public class app {
         myWriter.close();
     }
 
+    /**
+     * @param file
+     * @param analyzer
+     * @return
+     * @throws IOException
+     * @throws org.apache.lucene.queryparser.classic.ParseException
+     */
     public static ArrayList<BooleanQuery> createQueries(File file, Analyzer analyzer) throws IOException, org.apache.lucene.queryparser.classic.ParseException {
         ArrayList<BooleanQuery> queries = new ArrayList<>();
         BufferedReader reader = new BufferedReader(new FileReader(file));
@@ -123,14 +130,14 @@ public class app {
             }
             title = title.delete(0,8);
             num = num.delete(0,15);
+			/* Run 1 */
             // String queryStr = title.toString()+" "+desc.toString()+" "+narr.toString();
+            /* Run 2 */
             String queryStr = title.toString()+" "+narr.toString();
             
             Map<String, Float> boost = new HashMap<>();
-            boost.put("headline", (float) 0.1);
-            boost.put("text", (float) 0.9);
-//            boost.put("headline", (float) 0.5);
-//            boost.put("text", (float) 0.5);
+            boost.put("headline", (float) 1);
+            boost.put("text", (float) 5);
 
             queryStr = queryStr.replace("/", "\\/");
             MultiFieldQueryParser queryParser = new MultiFieldQueryParser(new String[]{"headline", "text"}, analyzer, boost);
@@ -148,16 +155,20 @@ public class app {
     public static void main(String[] args) throws IOException {
 
         try {
+        	/* Run 1 */
 //        	Analyzer analyzer = new EnglishAnalyzer(EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);
-            Analyzer analyzer = new StandardAnalyzer();
+        	/* Run 2 */
+        	Analyzer analyzer = new StandardAnalyzer();
             IndexWriterConfig config = new IndexWriterConfig(analyzer);
             
+            /* Run 1 */
             BM25Similarity bm25Similarity = new BM25Similarity();
             String name = "BM25";
+            /* Run 2 */
             LMDirichletSimilarity LMDirichlet = new LMDirichletSimilarity();
-//            BooleanSimilarity booleanSim = new BooleanSimilarity();
             MultiSimilarity combined = new MultiSimilarity(new Similarity[]{bm25Similarity, LMDirichlet});
             name = "combined";
+//          config.setSimilarity(bm25Similarity);
             config.setSimilarity(combined);
             config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
             
@@ -174,7 +185,7 @@ public class app {
             
             File file = new File("./topics");
             ArrayList<BooleanQuery> queries = createQueries(file, analyzer);
-//            // do a search if and only if indexes created successfully. 
+//          do a search if and only if indexes created successfully. 
             DirectoryReader dReader = DirectoryReader.open(directory);
             IndexSearcher iSearcher = new IndexSearcher(dReader);
             iSearcher.setSimilarity(combined);
