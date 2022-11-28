@@ -16,6 +16,7 @@ import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.*;
 import org.apache.lucene.search.similarities.BM25Similarity;
+import org.apache.lucene.search.similarities.BooleanSimilarity;
 import org.apache.lucene.search.similarities.ClassicSimilarity;
 import org.apache.lucene.search.similarities.LMDirichletSimilarity;
 import org.apache.lucene.search.similarities.MultiSimilarity;
@@ -122,10 +123,8 @@ public class app {
             }
             title = title.delete(0,8);
             num = num.delete(0,15);
-            // String queryStr = title.toString()+" "+desc.toString()+" "+narr.toString();
-            // String queryStr = title.toString();
-            // String queryStr = desc.toString()+" "+narr.toString();
-            String queryStr = title.toString()+" "+narr.toString();
+            String queryStr = title.toString()+" "+desc.toString()+" "+narr.toString();
+            // String queryStr = title.toString()+" "+narr.toString();
             
             Map<String, Float> boost = new HashMap<>();
             boost.put("headline", (float) 0.1);
@@ -156,8 +155,9 @@ public class app {
             BM25Similarity bm25Similarity = new BM25Similarity();
             String name = "BM25";
             LMDirichletSimilarity LMDirichlet = new LMDirichletSimilarity();
-            MultiSimilarity combined = new MultiSimilarity(new Similarity[]{bm25Similarity, LMDirichlet});
-            name = "combined";
+            BooleanSimilarity booleanSim = new BooleanSimilarity();
+            MultiSimilarity combined = new MultiSimilarity(new Similarity[]{bm25Similarity, LMDirichlet,booleanSim});
+            name = "combined_boolean";
             config.setSimilarity(combined);
             config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
             
