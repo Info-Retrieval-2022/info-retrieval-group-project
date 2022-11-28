@@ -127,8 +127,8 @@ public class app {
             // String queryStr = title.toString()+" "+narr.toString();
             
             Map<String, Float> boost = new HashMap<>();
-            boost.put("headline", (float) 0.01);
-            boost.put("text", (float) 0.99);
+            boost.put("headline", (float) 0.2);
+            boost.put("text", (float) 0.8);
 //            boost.put("headline", (float) 0.5);
 //            boost.put("text", (float) 0.5);
 
