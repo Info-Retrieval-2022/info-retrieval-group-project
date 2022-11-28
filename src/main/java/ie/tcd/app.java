@@ -144,8 +144,8 @@ public class app {
 //          StandardAnalyzer analyzer = new StandardAnalyzer();
 //        	WhitespaceAnalyzer whitespaceAnalyzer = new WhitespaceAnalyzer();
 //          SimpleAnalyzer simpleAnalyzer = new SimpleAnalyzer();
-//        	Analyzer english = new EnglishAnalyzer(EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);
-            Analyzer analyzer = new StandardAnalyzer();
+        	Analyzer analyzer = new EnglishAnalyzer(EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);
+//            Analyzer analyzer = new StandardAnalyzer();
             IndexWriterConfig config = new IndexWriterConfig(analyzer);
             
             BM25Similarity bm25Similarity = new BM25Similarity();
