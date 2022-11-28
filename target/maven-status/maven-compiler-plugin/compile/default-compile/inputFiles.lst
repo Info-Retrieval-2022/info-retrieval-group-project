@@ -1,5 +1,5 @@
-/assignment2/info-retrieval-group-project/src/main/java/ie/tcd/docParser/fbparser.java
-/assignment2/info-retrieval-group-project/src/main/java/ie/tcd/docParser/frparser.java
-/assignment2/info-retrieval-group-project/src/main/java/ie/tcd/docParser/latimes_parser.java
-/assignment2/info-retrieval-group-project/src/main/java/ie/tcd/app.java
-/assignment2/info-retrieval-group-project/src/main/java/ie/tcd/docParser/ftLoader.java
+/assignment2/english_analyser/info-retrieval-group-project/src/main/java/ie/tcd/app.java
+/assignment2/english_analyser/info-retrieval-group-project/src/main/java/ie/tcd/docParser/fbparser.java
+/assignment2/english_analyser/info-retrieval-group-project/src/main/java/ie/tcd/docParser/latimes_parser.java
+/assignment2/english_analyser/info-retrieval-group-project/src/main/java/ie/tcd/docParser/frparser.java
+/assignment2/english_analyser/info-retrieval-group-project/src/main/java/ie/tcd/docParser/ftLoader.java
