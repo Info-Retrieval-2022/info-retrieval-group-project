@@ -233,15 +233,15 @@ public class app {
             config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
  
             Directory directory = FSDirectory.open(Paths.get(INDEX_DIRECTORY));
-//            IndexWriter iwriter = new IndexWriter(directory, config);
-// 
-//            System.out.println("PWD: " + System.getProperty("user.dir"));
-// 
-//            frparser.parseFR94("./Assignment Two/fr94", iwriter);
-//            latimes_parser.loadLaTimesDocs("./Assignment Two/latimes", iwriter);
-//            ftLoader.parseFT("./Assignment Two/ft", iwriter);
-//            fbparser.parsefb("./Assignment Two/fbis", iwriter);
-//            iwriter.close();
+            IndexWriter iwriter = new IndexWriter(directory, config);
+ 
+            System.out.println("PWD: " + System.getProperty("user.dir"));
+ 
+            frparser.parseFR94("./Assignment Two/fr94", iwriter);
+            latimes_parser.loadLaTimesDocs("./Assignment Two/latimes", iwriter);
+            ftLoader.parseFT("./Assignment Two/ft", iwriter);
+            fbparser.parsefb("./Assignment Two/fbis", iwriter);
+            iwriter.close();
  
             File file = new File("./topics");
             ArrayList<BooleanQuery> queries = createQueries(file, analyzer);
