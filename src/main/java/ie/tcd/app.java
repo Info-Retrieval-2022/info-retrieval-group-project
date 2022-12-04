@@ -243,8 +243,8 @@ public class app {
             BooleanQuery booleanQuery = new BooleanQuery.Builder().add(query, BooleanClause.Occur.SHOULD)
                     .add(queryNarr,BooleanClause.Occur.SHOULD).add(queryNarr1,BooleanClause.Occur.SHOULD)
                     .add(queryNarr2,BooleanClause.Occur.SHOULD).add(queryNarr3,BooleanClause.Occur.SHOULD)
-//                    .add(queryirrel1,BooleanClause.Occur.MUST_NOT).add(queryirrel2,BooleanClause.Occur.MUST_NOT)
-//                    .add(queryirrel3,BooleanClause.Occur.MUST_NOT)
+                    .add(queryirrel1,BooleanClause.Occur.MUST_NOT).add(queryirrel2,BooleanClause.Occur.MUST_NOT)
+                    .add(queryirrel3,BooleanClause.Occur.MUST_NOT)
                     .build();
             queries.add(booleanQuery);
             string = reader.readLine();
