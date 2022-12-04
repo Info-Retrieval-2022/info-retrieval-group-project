@@ -15,6 +15,7 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.*;
+import org.apache.lucene.search.BooleanQuery.Builder;
 import org.apache.lucene.search.similarities.BM25Similarity;
 import org.apache.lucene.search.similarities.BooleanSimilarity;
 import org.apache.lucene.search.similarities.ClassicSimilarity;
@@ -62,9 +63,6 @@ public class app {
 
 
     public static List<String> StringSplitter(String text) {
-    //  String text = "Hello world. This is a test. I am a robot. How are you?";
-
-        // Use a regular expression to split the string by sentences
         Pattern pattern = Pattern.compile("\\.|\\;");
         Matcher matcher = pattern.matcher(text);
 
@@ -77,57 +75,29 @@ public class app {
         
         return sentences;
     }
-    public static String[] getRelevant(String narr){
+    public static List<String> getRelevant(String narr){
     	
     	List<String> sentences = StringSplitter(narr);
         List<String> relevantSentences = new ArrayList<>();
         for (String sentence : sentences) {
-        	System.out.println(sentence);
         	String search = "not relevant";
         	if (sentence.toLowerCase().indexOf(search.toLowerCase()) == -1 ) {
         		relevantSentences.add(sentence);
-            	System.out.println("Relevant Sentence Identified");
-        	}
-        	else {
-        		System.out.println("Relevant Sentence Not Identified");
         	}
         }
-        String[] array = new String [relevantSentences.size()];
-        relevantSentences.toArray(array);
-        return array;
-    	
-//        String[]relevant = narr.split("[.]");
-//        ArrayList<String>rels = new ArrayList<>();
-//        int i = 0;
-//        while(i<relevant.length){
-//            if ((relevant[i].contains("relevant")||relevant[i].contains("of interest"))
-//                    &&!(relevant[i].contains("not relevant")||relevant[i].contains("not of interest"))){
-//                rels.add(relevant[i]);
-//            }
-//            i++;
-//        }
-//        String[] simpleArray = new String[ rels.size() ];
-//        rels.toArray( simpleArray );
-//        return simpleArray;
+        return relevantSentences;
     }
  
-    public static String[] getIrrelevant(String narr){
+    public static List<String> getIrrelevant(String narr){
     	List<String> sentences = StringSplitter(narr);
         List<String> irrelevantSentences = new ArrayList<>();
         for (String sentence : sentences) {
-        	System.out.println(sentence);
         	String search = "not relevant";
         	if (sentence.toLowerCase().indexOf(search.toLowerCase()) != -1 ) {
         		irrelevantSentences.add(sentence);
-        		System.out.println("Irrelevant Sentence Identified");
-        	}
-        	else {
-        		System.out.println("Irrelevant Sentence Not Identified");
         	}
         }
-        String[] array = new String [irrelevantSentences.size()];
-        irrelevantSentences.toArray(array);
-        return array;
+        return irrelevantSentences;
     }
  
     // 1. Parses array list of queries and tokenizes each query using QueryParser
@@ -205,104 +175,37 @@ public class app {
             }
             title = title.delete(0,8);
             num = num.delete(0,15);
-			/* Run 1 */
-            String queryStr = title.toString()+" "+desc.toString();
+            String queryStrTitle = title.toString();
+            String queryStrDesc = desc.toString();
             String queryStrNarr = narr.toString();
-//            String queryStrNarr1="a";
-//            String queryStrNarr2="a";
-//            String queryStrNarr3="a";
-//            String irrel1="a";
-//            String irrel2="a";
-//            String irrel3="a";
-            String[] rels = getRelevant(queryStrNarr);
-            String[] irrels = getIrrelevant(queryStrNarr);
-            System.out.println(rels);
-            queryStrNarr = rels.toString();
-            String queryStrIrrel = irrels.toString();
- 
-//            if(rels.length==1){
-//                queryStrNarr = rels[0];
-//            }
-//            if(rels.length==2){
-//                queryStrNarr = rels[0];
-//                queryStrNarr1 = rels[1];
-//            }
-//            if(rels.length==3){
-//                queryStrNarr = rels[0];
-//                queryStrNarr1 = rels[1];
-//                queryStrNarr2 = rels[2];
-//            }
-//            if(rels.length==4){
-//                queryStrNarr = rels[0];
-//                queryStrNarr1 = rels[1];
-//                queryStrNarr2 = rels[2];
-//                queryStrNarr3 = rels[3];
-//            }
-// 
-//            if(irrels.length==1){
-//                irrel1 = irrels[0];
-//            }
-//            if(irrels.length==2){
-//                queryStrNarr = irrels[0];
-//                queryStrNarr1 = irrels[1];
-//            }
-//            if(irrels.length==3){
-//                queryStrNarr = irrels[0];
-//                queryStrNarr1 = irrels[1];
-//                queryStrNarr2 = irrels[2];
-//            }
-            /* Run 2 */
-            // String queryStr = title.toString()+" "+narr.toString();
+            List<String> rels = getRelevant(queryStrNarr);
+            List<String> irrels = getIrrelevant(queryStrNarr);
+            queryStrNarr = String.join(", ", rels);
+            String queryStrIrrel = String.join(", ", irrels);
  
             Map<String, Float> boost = new HashMap<>();
-            boost.put("headline", 0.08f);
-            boost.put("text", 0.92f);
- 
-//            queryStr = queryStr.replace("/", "\\/");
-//            queryStrNarr = queryStrNarr.replace("/", "\\/");
-//            queryStrIrrel = queryStrIrrel.replace("/", "\\/");
-//            queryStrNarr1 = queryStrNarr1.replace("/", "\\/");
-//            queryStrNarr2 = queryStrNarr2.replace("/", "\\/");
-//            queryStrNarr3 = queryStrNarr3.replace("/", "\\/");
-//            irrel1 = irrel1.replace("/", "\\/");
-//            irrel2 = irrel2.replace("/", "\\/");
-//            irrel3 = irrel3.replace("/", "\\/");
-//            bug fix for where (i.e) is present "(i" caused problems for queryparser
-//            NEEDS FIX, we want to keep the ie data as it has valuable key words.
-            queryStrNarr = queryStrNarr.replace("(i", "");
-            queryStrIrrel = queryStrIrrel.replace("(i", "");
-//            queryStrNarr1 = queryStrNarr1.replace("(i", "");
-//            queryStrNarr2 = queryStrNarr2.replace("(i", "");
-//            queryStrNarr3 = queryStrNarr3.replace("(i", "");
-//            irrel1 = irrel1.replace("(i", "");
-//            irrel2 = irrel2.replace("(i", "");
-//            irrel3 = irrel3.replace("(i", "");
+            boost.put("headline", 0.1f);
+            boost.put("text", 0.9f);
+
             MultiFieldQueryParser queryParser = new MultiFieldQueryParser(new String[]{"headline", "text"}, analyzer, boost);
             queryParser.setAllowLeadingWildcard(true);
-            Query query = queryParser.parse(QueryParser.escape(queryStr));
-            Query queryNarr = queryParser.parse(QueryParser.escape(queryStrNarr));
-            Query queryIrrel = queryParser.parse(QueryParser.escape(queryStrIrrel));
-//            Query queryNarr1 = queryParser.parse(queryStrNarr1);
-//            Query queryNarr2 = queryParser.parse(queryStrNarr2);
-//            Query queryNarr3 = queryParser.parse(queryStrNarr3);
-//            Query queryirrel1 = queryParser.parse(irrel1);
-//            Query queryirrel2 = queryParser.parse(irrel2);
-//            Query queryirrel3 = queryParser.parse(irrel3);
- 
-            BooleanQuery booleanQuery = new BooleanQuery.Builder()
-            		.add(new BoostQuery(query,5f), BooleanClause.Occur.SHOULD)
-                    .add(new BoostQuery(queryNarr, 3f),BooleanClause.Occur.SHOULD)
-       //             .add(new BoostQuery(queryIrrel, 2f),BooleanClause.Occur.MUST_NOT)
-       //             .add(queryNarr1,BooleanClause.Occur.SHOULD)
-       //             .add(queryNarr2,BooleanClause.Occur.SHOULD)
-       //             .add(queryNarr3,BooleanClause.Occur.SHOULD)
-       //             .add(queryirrel1,BooleanClause.Occur.MUST_NOT).add(queryirrel2,BooleanClause.Occur.MUST_NOT)
-       //             .add(queryirrel3,BooleanClause.Occur.MUST_NOT)
-                    .build();
-            queries.add(booleanQuery);
+            Query queryTitle = queryParser.parse(QueryParser.escape(queryStrTitle));
+            Query queryDesc = queryParser.parse(QueryParser.escape(queryStrDesc));
+            BooleanQuery.Builder booleanQuery = new BooleanQuery.Builder();
+            booleanQuery.add(new BoostQuery(queryTitle,5f), BooleanClause.Occur.SHOULD);
+            booleanQuery.add(new BoostQuery(queryDesc,4f), BooleanClause.Occur.SHOULD);
+            if (queryStrNarr.length()>0) {
+            	Query queryNarr = queryParser.parse(QueryParser.escape(queryStrNarr));
+            	booleanQuery.add(new BoostQuery(queryNarr, 3f),BooleanClause.Occur.SHOULD);
+            }
+            if (queryStrIrrel.length()>0) {
+            	Query queryIrrel = queryParser.parse(QueryParser.escape(queryStrIrrel));
+            	booleanQuery.add(new BoostQuery(queryIrrel, 2f),BooleanClause.Occur.FILTER);
+            }
+            queries.add(booleanQuery.build());
             string = reader.readLine();
             }
-     //   System.out.println(queries);
+        System.out.println(queries);
         reader.close();
         return queries;
         }
@@ -330,15 +233,15 @@ public class app {
             config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
  
             Directory directory = FSDirectory.open(Paths.get(INDEX_DIRECTORY));
-            IndexWriter iwriter = new IndexWriter(directory, config);
- 
-            System.out.println("PWD: " + System.getProperty("user.dir"));
- 
-            frparser.parseFR94("./Assignment Two/fr94", iwriter);
-            latimes_parser.loadLaTimesDocs("./Assignment Two/latimes", iwriter);
-            ftLoader.parseFT("./Assignment Two/ft", iwriter);
-            fbparser.parsefb("./Assignment Two/fbis", iwriter);
-            iwriter.close();
+//            IndexWriter iwriter = new IndexWriter(directory, config);
+// 
+//            System.out.println("PWD: " + System.getProperty("user.dir"));
+// 
+//            frparser.parseFR94("./Assignment Two/fr94", iwriter);
+//            latimes_parser.loadLaTimesDocs("./Assignment Two/latimes", iwriter);
+//            ftLoader.parseFT("./Assignment Two/ft", iwriter);
+//            fbparser.parsefb("./Assignment Two/fbis", iwriter);
+//            iwriter.close();
  
             File file = new File("./topics");
             ArrayList<BooleanQuery> queries = createQueries(file, analyzer);
