@@ -35,6 +35,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
  
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import ie.tcd.docParser.*;
  
 /**
@@ -54,38 +59,76 @@ public class app {
         directory.close();
         return hits;
     }
- 
-    public static String[] getRelevant(String narr){
-        String[]relevant = narr.split("[.]");
-        ArrayList<String>rels = new ArrayList<>();
-        int i = 0;
-        while(i<relevant.length){
-            if ((relevant[i].contains("relevant")||relevant[i].contains("of interest"))
-                    &&!(relevant[i].contains("not relevant")||relevant[i].contains("not of interest"))){
-                rels.add(relevant[i]);
-            }
-            i++;
+
+
+    public static List<String> StringSplitter(String text) {
+    //  String text = "Hello world. This is a test. I am a robot. How are you?";
+
+        // Use a regular expression to split the string by sentences
+        Pattern pattern = Pattern.compile("\\.|\\;");
+        Matcher matcher = pattern.matcher(text);
+
+        List<String> sentences = new ArrayList<>();
+        int start = 0;
+        while (matcher.find()) {
+          sentences.add(text.substring(start, matcher.start() + 1));
+          start = matcher.start() + 1;
         }
-        String[] simpleArray = new String[ rels.size() ];
-        rels.toArray( simpleArray );
-        return simpleArray;
+        
+        return sentences;
+    }
+    public static String[] getRelevant(String narr){
+    	
+    	List<String> sentences = StringSplitter(narr);
+        List<String> relevantSentences = new ArrayList<>();
+        for (String sentence : sentences) {
+        	System.out.println(sentence);
+        	String search = "not relevant";
+        	if (sentence.toLowerCase().indexOf(search.toLowerCase()) == -1 ) {
+        		relevantSentences.add(sentence);
+            	System.out.println("Relevant Sentence Identified");
+        	}
+        	else {
+        		System.out.println("Relevant Sentence Not Identified");
+        	}
+        }
+        String[] array = new String [relevantSentences.size()];
+        relevantSentences.toArray(array);
+        return array;
+    	
+//        String[]relevant = narr.split("[.]");
+//        ArrayList<String>rels = new ArrayList<>();
+//        int i = 0;
+//        while(i<relevant.length){
+//            if ((relevant[i].contains("relevant")||relevant[i].contains("of interest"))
+//                    &&!(relevant[i].contains("not relevant")||relevant[i].contains("not of interest"))){
+//                rels.add(relevant[i]);
+//            }
+//            i++;
+//        }
+//        String[] simpleArray = new String[ rels.size() ];
+//        rels.toArray( simpleArray );
+//        return simpleArray;
     }
  
     public static String[] getIrrelevant(String narr){
-        String[]irrelevant = narr.split("[.]");
-        ArrayList<String>irrels = new ArrayList<>();
-        int i = 0;
-        while(i<irrelevant.length){
-            if ((irrelevant[i].contains("not relevant")||irrelevant[i].contains("not of interest"))){
-                irrels.add(irrelevant[i]);
-            }
-            i++;
+    	List<String> sentences = StringSplitter(narr);
+        List<String> irrelevantSentences = new ArrayList<>();
+        for (String sentence : sentences) {
+        	System.out.println(sentence);
+        	String search = "not relevant";
+        	if (sentence.toLowerCase().indexOf(search.toLowerCase()) != -1 ) {
+        		irrelevantSentences.add(sentence);
+        		System.out.println("Irrelevant Sentence Identified");
+        	}
+        	else {
+        		System.out.println("Irrelevant Sentence Not Identified");
+        	}
         }
-        String[] simpleArray = new String[ irrels.size() ];
-        irrels.toArray( simpleArray );
-        return simpleArray;
+        String[] array = new String [irrelevantSentences.size()];
+        irrelevantSentences.toArray(array);
+        return array;
     }
- 
  
     // 1. Parses array list of queries and tokenizes each query using QueryParser
     public static ArrayList<ScoreDoc[]> getHits(IndexSearcher iSearcher, ArrayList<BooleanQuery>queries) throws IOException, ParseException, org.apache.lucene.queryparser.classic.ParseException {
@@ -171,8 +214,9 @@ public class app {
 //            String irrel1="a";
 //            String irrel2="a";
 //            String irrel3="a";
-            String[]irrels = getIrrelevant(queryStrNarr);
-            String[]rels = getRelevant(queryStrNarr);
+            String[] rels = getRelevant(queryStrNarr);
+            String[] irrels = getIrrelevant(queryStrNarr);
+            System.out.println(rels);
             queryStrNarr = rels.toString();
             String queryStrIrrel = irrels.toString();
  
@@ -245,9 +289,10 @@ public class app {
 //            Query queryirrel2 = queryParser.parse(irrel2);
 //            Query queryirrel3 = queryParser.parse(irrel3);
  
-            BooleanQuery booleanQuery = new BooleanQuery.Builder().add(new BoostQuery(query,5f), BooleanClause.Occur.SHOULD)
-                    .add(new BoostQuery(queryNarr, 4f),BooleanClause.Occur.SHOULD)
-                    .add(new BoostQuery(queryIrrel, 4f),BooleanClause.Occur.FILTER)
+            BooleanQuery booleanQuery = new BooleanQuery.Builder()
+            		.add(new BoostQuery(query,5f), BooleanClause.Occur.SHOULD)
+                    .add(new BoostQuery(queryNarr, 3f),BooleanClause.Occur.SHOULD)
+       //             .add(new BoostQuery(queryIrrel, 2f),BooleanClause.Occur.MUST_NOT)
        //             .add(queryNarr1,BooleanClause.Occur.SHOULD)
        //             .add(queryNarr2,BooleanClause.Occur.SHOULD)
        //             .add(queryNarr3,BooleanClause.Occur.SHOULD)
@@ -257,6 +302,7 @@ public class app {
             queries.add(booleanQuery);
             string = reader.readLine();
             }
+     //   System.out.println(queries);
         reader.close();
         return queries;
         }

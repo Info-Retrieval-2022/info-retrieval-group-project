@@ -36,9 +36,9 @@ public class ftLoader {
                     dateline = element.select("DATELINE").text();
                     byline = element.select("BYLINE").text();
                     text = element.select("TEXT").text();
-                    System.out.println(docno);
+                    System.out.println("Reading "+docno);
                     Document doc = new Document();
-           //         doc.add(new StringField("docno", docno, Field.Store.YES));
+                    doc.add(new StringField("docno", docno, Field.Store.YES));
            //         doc.add(new TextField("date", date, Field.Store.YES));
                     doc.add(new TextField("headline", headline, Field.Store.YES));
           //         doc.add(new TextField("pub", pub, Field.Store.YES));

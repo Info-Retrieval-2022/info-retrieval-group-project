@@ -41,9 +41,9 @@ public class frparser {
                     SUMMARY_Str = element.select("SUMMARY").text();
                     DATE_Str = element.select("DATE").text();
                     AGENCY_Str = element.select("AGENCY").text();
-                    System.out.println("reading file: " + DOCNO_Str);
+                    System.out.println("Reading " + DOCNO_Str);
                     Document document = new Document();
-             //       document.add(new StringField("docno", DOCNO_Str, Field.Store.YES));
+                    document.add(new StringField("docno", DOCNO_Str, Field.Store.YES));
              //       document.add(new TextField("date", DATE_Str, Field.Store.YES));
                     document.add(new TextField("headline", ACTION_Str, Field.Store.YES));
                     document.add(new TextField("text", SUMMARY_Str, Field.Store.YES));
