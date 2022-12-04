@@ -165,86 +165,94 @@ public class app {
 			/* Run 1 */
             String queryStr = title.toString()+" "+desc.toString();
             String queryStrNarr = narr.toString();
-            String queryStrNarr1="a";
-            String queryStrNarr2="a";
-            String queryStrNarr3="a";
-            String irrel1="a";
-            String irrel2="a";
-            String irrel3="a";
+//            String queryStrNarr1="a";
+//            String queryStrNarr2="a";
+//            String queryStrNarr3="a";
+//            String irrel1="a";
+//            String irrel2="a";
+//            String irrel3="a";
             String[]irrels = getIrrelevant(queryStrNarr);
             String[]rels = getRelevant(queryStrNarr);
+            queryStrNarr = rels.toString();
+            String queryStrIrrel = irrels.toString();
  
-            if(rels.length==1){
-                queryStrNarr = rels[0];
-            }
-            if(rels.length==2){
-                queryStrNarr = rels[0];
-                queryStrNarr1 = rels[1];
-            }
-            if(rels.length==3){
-                queryStrNarr = rels[0];
-                queryStrNarr1 = rels[1];
-                queryStrNarr2 = rels[2];
-            }
-            if(rels.length==4){
-                queryStrNarr = rels[0];
-                queryStrNarr1 = rels[1];
-                queryStrNarr2 = rels[2];
-                queryStrNarr3 = rels[3];
-            }
- 
-            if(irrels.length==1){
-                irrel1 = irrels[0];
-            }
-            if(irrels.length==2){
-                queryStrNarr = irrels[0];
-                queryStrNarr1 = irrels[1];
-            }
-            if(irrels.length==3){
-                queryStrNarr = irrels[0];
-                queryStrNarr1 = irrels[1];
-                queryStrNarr2 = irrels[2];
-            }
+//            if(rels.length==1){
+//                queryStrNarr = rels[0];
+//            }
+//            if(rels.length==2){
+//                queryStrNarr = rels[0];
+//                queryStrNarr1 = rels[1];
+//            }
+//            if(rels.length==3){
+//                queryStrNarr = rels[0];
+//                queryStrNarr1 = rels[1];
+//                queryStrNarr2 = rels[2];
+//            }
+//            if(rels.length==4){
+//                queryStrNarr = rels[0];
+//                queryStrNarr1 = rels[1];
+//                queryStrNarr2 = rels[2];
+//                queryStrNarr3 = rels[3];
+//            }
+// 
+//            if(irrels.length==1){
+//                irrel1 = irrels[0];
+//            }
+//            if(irrels.length==2){
+//                queryStrNarr = irrels[0];
+//                queryStrNarr1 = irrels[1];
+//            }
+//            if(irrels.length==3){
+//                queryStrNarr = irrels[0];
+//                queryStrNarr1 = irrels[1];
+//                queryStrNarr2 = irrels[2];
+//            }
             /* Run 2 */
             // String queryStr = title.toString()+" "+narr.toString();
  
             Map<String, Float> boost = new HashMap<>();
-            boost.put("headline", (float) 0.1);
-            boost.put("text", (float) 0.9);
+            boost.put("headline", 0.08f);
+            boost.put("text", 0.92f);
  
-            queryStr = queryStr.replace("/", "\\/");
-            queryStrNarr = queryStrNarr.replace("/", "\\/");
-            queryStrNarr1 = queryStrNarr1.replace("/", "\\/");
-            queryStrNarr2 = queryStrNarr2.replace("/", "\\/");
-            queryStrNarr3 = queryStrNarr3.replace("/", "\\/");
-            irrel1 = irrel1.replace("/", "\\/");
-            irrel2 = irrel2.replace("/", "\\/");
-            irrel3 = irrel3.replace("/", "\\/");
+//            queryStr = queryStr.replace("/", "\\/");
+//            queryStrNarr = queryStrNarr.replace("/", "\\/");
+//            queryStrIrrel = queryStrIrrel.replace("/", "\\/");
+//            queryStrNarr1 = queryStrNarr1.replace("/", "\\/");
+//            queryStrNarr2 = queryStrNarr2.replace("/", "\\/");
+//            queryStrNarr3 = queryStrNarr3.replace("/", "\\/");
+//            irrel1 = irrel1.replace("/", "\\/");
+//            irrel2 = irrel2.replace("/", "\\/");
+//            irrel3 = irrel3.replace("/", "\\/");
 //            bug fix for where (i.e) is present "(i" caused problems for queryparser
 //            NEEDS FIX, we want to keep the ie data as it has valuable key words.
             queryStrNarr = queryStrNarr.replace("(i", "");
-            queryStrNarr1 = queryStrNarr1.replace("(i", "");
-            queryStrNarr2 = queryStrNarr2.replace("(i", "");
-            queryStrNarr3 = queryStrNarr3.replace("(i", "");
-            irrel1 = irrel1.replace("(i", "");
-            irrel2 = irrel2.replace("(i", "");
-            irrel3 = irrel3.replace("(i", "");
+            queryStrIrrel = queryStrIrrel.replace("(i", "");
+//            queryStrNarr1 = queryStrNarr1.replace("(i", "");
+//            queryStrNarr2 = queryStrNarr2.replace("(i", "");
+//            queryStrNarr3 = queryStrNarr3.replace("(i", "");
+//            irrel1 = irrel1.replace("(i", "");
+//            irrel2 = irrel2.replace("(i", "");
+//            irrel3 = irrel3.replace("(i", "");
             MultiFieldQueryParser queryParser = new MultiFieldQueryParser(new String[]{"headline", "text"}, analyzer, boost);
             queryParser.setAllowLeadingWildcard(true);
-            Query query = queryParser.parse(queryStr);
-            Query queryNarr = queryParser.parse(queryStrNarr);
-            Query queryNarr1 = queryParser.parse(queryStrNarr1);
-            Query queryNarr2 = queryParser.parse(queryStrNarr2);
-            Query queryNarr3 = queryParser.parse(queryStrNarr3);
-            Query queryirrel1 = queryParser.parse(irrel1);
-            Query queryirrel2 = queryParser.parse(irrel2);
-            Query queryirrel3 = queryParser.parse(irrel3);
+            Query query = queryParser.parse(QueryParser.escape(queryStr));
+            Query queryNarr = queryParser.parse(QueryParser.escape(queryStrNarr));
+            Query queryIrrel = queryParser.parse(QueryParser.escape(queryStrIrrel));
+//            Query queryNarr1 = queryParser.parse(queryStrNarr1);
+//            Query queryNarr2 = queryParser.parse(queryStrNarr2);
+//            Query queryNarr3 = queryParser.parse(queryStrNarr3);
+//            Query queryirrel1 = queryParser.parse(irrel1);
+//            Query queryirrel2 = queryParser.parse(irrel2);
+//            Query queryirrel3 = queryParser.parse(irrel3);
  
-            BooleanQuery booleanQuery = new BooleanQuery.Builder().add(query, BooleanClause.Occur.SHOULD)
-                    .add(queryNarr,BooleanClause.Occur.SHOULD).add(queryNarr1,BooleanClause.Occur.SHOULD)
-                    .add(queryNarr2,BooleanClause.Occur.SHOULD).add(queryNarr3,BooleanClause.Occur.SHOULD)
-                    .add(queryirrel1,BooleanClause.Occur.MUST_NOT).add(queryirrel2,BooleanClause.Occur.MUST_NOT)
-                    .add(queryirrel3,BooleanClause.Occur.MUST_NOT)
+            BooleanQuery booleanQuery = new BooleanQuery.Builder().add(new BoostQuery(query,5f), BooleanClause.Occur.SHOULD)
+                    .add(new BoostQuery(queryNarr, 4f),BooleanClause.Occur.SHOULD)
+                    .add(new BoostQuery(queryIrrel, 4f),BooleanClause.Occur.FILTER)
+       //             .add(queryNarr1,BooleanClause.Occur.SHOULD)
+       //             .add(queryNarr2,BooleanClause.Occur.SHOULD)
+       //             .add(queryNarr3,BooleanClause.Occur.SHOULD)
+       //             .add(queryirrel1,BooleanClause.Occur.MUST_NOT).add(queryirrel2,BooleanClause.Occur.MUST_NOT)
+       //             .add(queryirrel3,BooleanClause.Occur.MUST_NOT)
                     .build();
             queries.add(booleanQuery);
             string = reader.readLine();

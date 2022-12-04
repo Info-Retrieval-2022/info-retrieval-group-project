@@ -47,11 +47,11 @@ public class latimes_parser {
     	String publication = "LA Times";
     	
         org.apache.lucene.document.Document document = new org.apache.lucene.document.Document();
-        document.add(new StringField("docno", docNo, Field.Store.YES));
-        document.add(new TextField("date", date, Field.Store.YES));
+   //     document.add(new StringField("docno", docNo, Field.Store.YES));
+   //     document.add(new TextField("date", date, Field.Store.YES));
         document.add(new TextField("headline", headline, Field.Store.YES));
         document.add(new TextField("text", text, Field.Store.YES));
-        document.add(new TextField("pub", publication, Field.Store.YES));
+   //     document.add(new TextField("pub", publication, Field.Store.YES));
         return document;
     }
 

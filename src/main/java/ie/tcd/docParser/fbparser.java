@@ -49,12 +49,12 @@ public class fbparser
 					Document document = new Document();
 
 					// System.out.println(link.getElementsByTag("DOCNO").text() +"\n");
-					String id = link.getElementsByTag("DOCNO").text();
-					document.add(new StringField("docno", id, Field.Store.YES));
+				//	String id = link.getElementsByTag("DOCNO").text();
+				//	document.add(new StringField("docno", id, Field.Store.YES));
 
 					//System.out.println(link.getElementsByTag("DATE1").text()+"\n");
-					String date = link.getElementsByTag("DATE1").text();
-					document.add(new TextField("date", date, Field.Store.YES));
+				//	String date = link.getElementsByTag("DATE1").text();
+				//	document.add(new TextField("date", date, Field.Store.YES));
 
 					// System.out.println(link.getElementsByTag("TI").text()+"\n");
 					String headline = link.getElementsByTag("TI").text();
@@ -65,8 +65,8 @@ public class fbparser
 					document.add(new TextField("text", text, Field.Store.YES));
 
 					// System.out.println(link.getElementsByAttributeValue("P", "104").text()+"\n");
-					String pub = link.getElementsByAttributeValue("P", "104").text();
-					document.add(new TextField("pub", pub, Field.Store.YES));
+				//	String pub = link.getElementsByAttributeValue("P", "104").text();
+				//	document.add(new TextField("pub", pub, Field.Store.YES));
 				//	doclist.add(document);
 					iwriter.addDocument(document);
 					++Icnt;
