@@ -59,6 +59,8 @@ public class app {
  
  
     public static List<String> StringSplitter(String text) {
+    	text = text.replace("e.g."," ");
+    	text = text.replace("i.e."," ");
         Pattern pattern = Pattern.compile("\\.|\\;");
         Matcher matcher = pattern.matcher(text);
  
@@ -236,7 +238,7 @@ public class app {
             queries.add(booleanQuery.build());
             string = reader.readLine();
         }
-        System.out.println(queries);
+     //   System.out.println(queries);
         reader.close();
         return queries;
     }
