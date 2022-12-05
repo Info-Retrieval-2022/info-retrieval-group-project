@@ -30,20 +30,13 @@ public class fbparser
 {
     public static ArrayList<Document> parsefb(String input, IndexWriter iwriter) throws IOException {
     	ArrayList<Document> doclist = new ArrayList<>();
-		int Fcnt = 0;
 		File dir = new File(input);
 		File[] directoryListing = dir.listFiles();
-			for (File child : directoryListing) {
-				if((child.getName()).startsWith("fb")){
-				int Icnt = 0;
-
-				
-				++Fcnt;
-
+		for (File child : directoryListing) {
+			if((child.getName()).startsWith("fb")){				
 				org.jsoup.nodes.Document doc = Jsoup.parse(child,"utf-8");//assuming register.html file in e drive  
 		
 				Elements ele = doc.getElementsByTag("DOC");
-				Icnt = 0;
 
 				for(Element link : ele){
 					Document document = new Document();
@@ -53,8 +46,8 @@ public class fbparser
 					document.add(new StringField("docno", id, Field.Store.YES));
 
 					//System.out.println(link.getElementsByTag("DATE1").text()+"\n");
-					String date = link.getElementsByTag("DATE1").text();
-					document.add(new TextField("date", date, Field.Store.YES));
+				//	String date = link.getElementsByTag("DATE1").text();
+				//	document.add(new TextField("date", date, Field.Store.YES));
 
 					// System.out.println(link.getElementsByTag("TI").text()+"\n");
 					String headline = link.getElementsByTag("TI").text();
@@ -65,16 +58,15 @@ public class fbparser
 					document.add(new TextField("text", text, Field.Store.YES));
 
 					// System.out.println(link.getElementsByAttributeValue("P", "104").text()+"\n");
-					String pub = link.getElementsByAttributeValue("P", "104").text();
-					document.add(new TextField("pub", pub, Field.Store.YES));
+				//	String pub = link.getElementsByAttributeValue("P", "104").text();
+				//	document.add(new TextField("pub", pub, Field.Store.YES));
 				//	doclist.add(document);
 					iwriter.addDocument(document);
-					++Icnt;
-
+					System.out.println("Reading " + id);
 				}
-				System.out.println(child.getName()+ " Docnos "+Integer.toString(Icnt));
 			}
 		}
+		System.out.println("Parsing FB Documents done...");
 		return doclist;
     }
 }
