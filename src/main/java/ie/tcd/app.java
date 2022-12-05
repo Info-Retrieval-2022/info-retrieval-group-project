@@ -231,10 +231,11 @@ public class app {
             }
  
             // Irrelevant prt of query hurting map currently- Can comment out this if.
-            if (queryStrIrrel.length()>0) {
-                Query queryIrrel = negqueryParser.parse(QueryParser.escape(queryStrIrrel));
-                booleanQuery.add(new BoostQuery(queryIrrel, 2f),BooleanClause.Occur.FILTER);
-            }
+            // Exclude this query to score 0.3 for MAP
+//            if (queryStrIrrel.length()>0) {
+//                Query queryIrrel = negqueryParser.parse(QueryParser.escape(queryStrIrrel));
+//                booleanQuery.add(new BoostQuery(queryIrrel, 2f),BooleanClause.Occur.MUST_NOT);
+//            }
             queries.add(booleanQuery.build());
             string = reader.readLine();
         }
@@ -253,7 +254,7 @@ public class app {
             /* Run 1 */
             Analyzer analyzer = new EnglishAnalyzer(EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);
             /* Run 2 */
-//       	Analyzer analyzer = new StandardAnalyzer();
+//        	Analyzer analyzer = new StandardAnalyzer();
             IndexWriterConfig config = new IndexWriterConfig(analyzer);
  
             /* Run 1 */
@@ -268,15 +269,15 @@ public class app {
             config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
  
             Directory directory = FSDirectory.open(Paths.get(INDEX_DIRECTORY));
-//            IndexWriter iwriter = new IndexWriter(directory, config);
-//
-//            System.out.println("PWD: " + System.getProperty("user.dir"));
-//
-//            frparser.parseFR94("./Assignment Two/fr94", iwriter);
-//            latimes_parser.loadLaTimesDocs("./Assignment Two/latimes", iwriter);
-//            ftLoader.parseFT("./Assignment Two/ft", iwriter);
-//            fbparser.parsefb("./Assignment Two/fbis", iwriter);
-//            iwriter.close();
+            IndexWriter iwriter = new IndexWriter(directory, config);
+
+            System.out.println("PWD: " + System.getProperty("user.dir"));
+
+            frparser.parseFR94("./Assignment Two/fr94", iwriter);
+            latimes_parser.loadLaTimesDocs("./Assignment Two/latimes", iwriter);
+            ftLoader.parseFT("./Assignment Two/ft", iwriter);
+            fbparser.parsefb("./Assignment Two/fbis", iwriter);
+            iwriter.close();
  
             File file = new File("./topics");
             ArrayList<BooleanQuery> queries = createQueries(file, analyzer);
