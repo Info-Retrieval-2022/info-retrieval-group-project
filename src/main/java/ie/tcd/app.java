@@ -100,7 +100,7 @@ public class app {
  
     // 1. Parses array list of queries and tokenizes each query using QueryParser
     public static ArrayList<ScoreDoc[]> getHits(IndexSearcher iSearcher, ArrayList<BooleanQuery>queries) throws IOException, ParseException, org.apache.lucene.queryparser.classic.ParseException {
-        int hitsperpage = 50;
+        int hitsperpage = 1000;
  
         // For each parsed query, search the index, Store hits in an array of arrays "hits"
         ArrayList<ScoreDoc[]> hits = new ArrayList<>();
