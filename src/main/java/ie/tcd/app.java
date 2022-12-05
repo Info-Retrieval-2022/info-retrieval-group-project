@@ -30,17 +30,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
  
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+ 
 import ie.tcd.docParser.*;
  
 /**
@@ -60,42 +56,42 @@ public class app {
         directory.close();
         return hits;
     }
-
-
+ 
+ 
     public static List<String> StringSplitter(String text) {
         Pattern pattern = Pattern.compile("\\.|\\;");
         Matcher matcher = pattern.matcher(text);
-
+ 
         List<String> sentences = new ArrayList<>();
         int start = 0;
         while (matcher.find()) {
-          sentences.add(text.substring(start, matcher.start() + 1));
-          start = matcher.start() + 1;
+            sentences.add(text.substring(start, matcher.start() + 1));
+            start = matcher.start() + 1;
         }
-        
+ 
         return sentences;
     }
     public static List<String> getRelevant(String narr){
-    	
-    	List<String> sentences = StringSplitter(narr);
+ 
+        List<String> sentences = StringSplitter(narr);
         List<String> relevantSentences = new ArrayList<>();
         for (String sentence : sentences) {
-        	String search = "not relevant";
-        	if (sentence.toLowerCase().indexOf(search.toLowerCase()) == -1 ) {
-        		relevantSentences.add(sentence);
-        	}
+            if (!(sentence.toLowerCase().contains("not relevant"))&&!(sentence.toLowerCase().contains("irrelevant"))) {
+                sentence = sentence.replace(" relevant ", " ");
+                relevantSentences.add(sentence);
+            }
         }
         return relevantSentences;
     }
  
     public static List<String> getIrrelevant(String narr){
-    	List<String> sentences = StringSplitter(narr);
+        List<String> sentences = StringSplitter(narr);
         List<String> irrelevantSentences = new ArrayList<>();
         for (String sentence : sentences) {
-        	String search = "not relevant";
-        	if (sentence.toLowerCase().indexOf(search.toLowerCase()) != -1 ) {
-        		irrelevantSentences.add(sentence);
-        	}
+            if ((sentence.toLowerCase().contains("not relevant"))||(sentence.toLowerCase().contains("irrelevant"))){
+                sentence = sentence.replace(" not relevant ", " ");
+                irrelevantSentences.add(sentence);
+            }
         }
         return irrelevantSentences;
     }
@@ -130,6 +126,30 @@ public class app {
         myWriter.close();
     }
  
+    public static String[] get_rel_list(String Title, String relevant) {
+        String[] rel = relevant.split("\\s+");
+        String[] tit = Title.split("\\s+");
+        String[] words = new String[rel.length + tit.length];
+        for (int i = 0; i < rel.length; i++) {
+            words[i] = rel[i].replaceAll("[^\\w]", "");
+        }
+ 
+        for (int i = rel.length; i < words.length; i++) {
+            words[i] = tit[i-rel.length].replaceAll("[^\\w]", "");
+        }
+        return words;
+    }
+ 
+    public static String trimIrrelevant(String Title, String relevant, String irrelevant){
+        String[] words = get_rel_list(Title, relevant);
+        for (String word : words) {
+            if (irrelevant.contains(word)) {
+                irrelevant = irrelevant.replace(" " + word + " ", " ");
+            }
+        }
+        irrelevant = irrelevant.replace("not relevant", " ");
+        return irrelevant;
+    }
     /**
      * @param file
      * @param analyzer
@@ -182,42 +202,55 @@ public class app {
             List<String> irrels = getIrrelevant(queryStrNarr);
             queryStrNarr = String.join(", ", rels);
             String queryStrIrrel = String.join(", ", irrels);
+            queryStrIrrel = trimIrrelevant(queryStrTitle, queryStrNarr, queryStrIrrel);
+ 
  
             Map<String, Float> boost = new HashMap<>();
             boost.put("headline", 0.1f);
             boost.put("text", 0.9f);
-
+ 
+            Map<String, Float> negboost = new HashMap<>();
+            negboost.put("headline", 0.2f);
+            negboost.put("text", 0.8f);
+ 
+            MultiFieldQueryParser negqueryParser = new MultiFieldQueryParser(new String[]{"headline", "text"}, analyzer, negboost);
+            negqueryParser.setAllowLeadingWildcard(true);
             MultiFieldQueryParser queryParser = new MultiFieldQueryParser(new String[]{"headline", "text"}, analyzer, boost);
             queryParser.setAllowLeadingWildcard(true);
+ 
             Query queryTitle = queryParser.parse(QueryParser.escape(queryStrTitle));
             Query queryDesc = queryParser.parse(QueryParser.escape(queryStrDesc));
             BooleanQuery.Builder booleanQuery = new BooleanQuery.Builder();
             booleanQuery.add(new BoostQuery(queryTitle,5f), BooleanClause.Occur.SHOULD);
             booleanQuery.add(new BoostQuery(queryDesc,4f), BooleanClause.Occur.SHOULD);
             if (queryStrNarr.length()>0) {
-            	Query queryNarr = queryParser.parse(QueryParser.escape(queryStrNarr));
-            	booleanQuery.add(new BoostQuery(queryNarr, 3f),BooleanClause.Occur.SHOULD);
+                Query queryNarr = queryParser.parse(QueryParser.escape(queryStrNarr));
+                booleanQuery.add(new BoostQuery(queryNarr, 3f),BooleanClause.Occur.SHOULD);
             }
+ 
+            // Irrelevant prt of query hurting map currently- Can comment out this if.
             if (queryStrIrrel.length()>0) {
-            	Query queryIrrel = queryParser.parse(QueryParser.escape(queryStrIrrel));
-            	booleanQuery.add(new BoostQuery(queryIrrel, 2f),BooleanClause.Occur.FILTER);
+                Query queryIrrel = negqueryParser.parse(QueryParser.escape(queryStrIrrel));
+                booleanQuery.add(new BoostQuery(queryIrrel, 2f),BooleanClause.Occur.FILTER);
             }
             queries.add(booleanQuery.build());
             string = reader.readLine();
-            }
+        }
         System.out.println(queries);
         reader.close();
         return queries;
-        }
+    }
+ 
+ 
  
  
  
     public static void main(String[] args) throws IOException {
  
         try {
-        	/* Run 1 */
-        	Analyzer analyzer = new EnglishAnalyzer(EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);
-        	/* Run 2 */
+            /* Run 1 */
+            Analyzer analyzer = new EnglishAnalyzer(EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);
+            /* Run 2 */
 //       	Analyzer analyzer = new StandardAnalyzer();
             IndexWriterConfig config = new IndexWriterConfig(analyzer);
  
@@ -233,19 +266,19 @@ public class app {
             config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
  
             Directory directory = FSDirectory.open(Paths.get(INDEX_DIRECTORY));
-            IndexWriter iwriter = new IndexWriter(directory, config);
- 
-            System.out.println("PWD: " + System.getProperty("user.dir"));
- 
-            frparser.parseFR94("./Assignment Two/fr94", iwriter);
-            latimes_parser.loadLaTimesDocs("./Assignment Two/latimes", iwriter);
-            ftLoader.parseFT("./Assignment Two/ft", iwriter);
-            fbparser.parsefb("./Assignment Two/fbis", iwriter);
-            iwriter.close();
+//            IndexWriter iwriter = new IndexWriter(directory, config);
+//
+//            System.out.println("PWD: " + System.getProperty("user.dir"));
+//
+//            frparser.parseFR94("./Assignment Two/fr94", iwriter);
+//            latimes_parser.loadLaTimesDocs("./Assignment Two/latimes", iwriter);
+//            ftLoader.parseFT("./Assignment Two/ft", iwriter);
+//            fbparser.parsefb("./Assignment Two/fbis", iwriter);
+//            iwriter.close();
  
             File file = new File("./topics");
             ArrayList<BooleanQuery> queries = createQueries(file, analyzer);
-//          do a search if and only if indexes created successfully. 
+//          do a search if and only if indexes created successfully.
             DirectoryReader dReader = DirectoryReader.open(directory);
             IndexSearcher iSearcher = new IndexSearcher(dReader);
             iSearcher.setSimilarity(combined);
