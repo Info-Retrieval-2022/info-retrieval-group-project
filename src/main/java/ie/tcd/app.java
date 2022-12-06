@@ -46,7 +46,7 @@ import ie.tcd.docParser.*;
 public class app {
  
     private static String INDEX_DIRECTORY = "index";
- 
+    private static int run_choice = 1;
     static ScoreDoc[] queryIndex(int idx, ArrayList<BooleanQuery> queries, int num_hits, IndexSearcher iSearcher) throws IOException, ParseException {
         Directory directory = FSDirectory.open(Paths.get(INDEX_DIRECTORY));
         DirectoryReader iReader = DirectoryReader.open(directory);
@@ -124,7 +124,7 @@ public class app {
                 c++;
             }
         }
-        System.out.println("results file ready");
+        System.out.println("results file ready: "+ name);
         myWriter.close();
     }
  
@@ -246,11 +246,22 @@ public class app {
  
  
  
- 
- 
+//    1.to run the run5(best) setup and create index, use cmd:
+//    # java -jar target/assxx.jar 5 c 
+//    2.to run the run5(best) setup without create index, use cmd:
+//    # java -jar target/assxx.jar 5
+//    or
+//    # java -jar target/assxx.jar 
     public static void main(String[] args) throws IOException {
  
         try {
+        	String QUERY_RESULT_NAME = "RUN5"; //default
+        	
+        	if(args.length >=1) {
+        		run_choice = Integer.parseInt(args[0]);
+        		QUERY_RESULT_NAME = "RUN" + args[0];
+        	}
+        	
             /* Run 1 */
             Analyzer analyzer = new EnglishAnalyzer(EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);
             /* Run 2 */
@@ -259,26 +270,28 @@ public class app {
  
             /* Run 1 */
             BM25Similarity bm25Similarity = new BM25Similarity();
-            String name = "BM25";
+            
 //          config.setSimilarity(bm25Similarity);
             /* Run 2 */
             LMDirichletSimilarity LMDirichlet = new LMDirichletSimilarity();
             MultiSimilarity combined = new MultiSimilarity(new Similarity[]{bm25Similarity, LMDirichlet});
-            name = "combined";
+            
             config.setSimilarity(combined);
             config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
- 
             Directory directory = FSDirectory.open(Paths.get(INDEX_DIRECTORY));
-            IndexWriter iwriter = new IndexWriter(directory, config);
-
-            System.out.println("PWD: " + System.getProperty("user.dir"));
-
-            frparser.parseFR94("./Assignment Two/fr94", iwriter);
-            latimes_parser.loadLaTimesDocs("./Assignment Two/latimes", iwriter);
-            ftLoader.parseFT("./Assignment Two/ft", iwriter);
-            fbparser.parsefb("./Assignment Two/fbis", iwriter);
-            iwriter.close();
- 
+            
+            // Create Index optional           
+            if((args.length >=2) && args[0].equals("c"))
+            {  
+	            IndexWriter iwriter = new IndexWriter(directory, config);
+	            System.out.println("PWD: " + System.getProperty("user.dir"));
+	            frparser.parseFR94("./Assignment Two/fr94", iwriter);
+	            latimes_parser.loadLaTimesDocs("./Assignment Two/latimes", iwriter);
+	            ftLoader.parseFT("./Assignment Two/ft", iwriter);
+	            fbparser.parsefb("./Assignment Two/fbis", iwriter);
+	            iwriter.close();
+            }
+            
             File file = new File("./topics");
             ArrayList<BooleanQuery> queries = createQueries(file, analyzer);
 //          do a search if and only if indexes created successfully.
@@ -286,7 +299,8 @@ public class app {
             IndexSearcher iSearcher = new IndexSearcher(dReader);
             iSearcher.setSimilarity(combined);
             ArrayList<ScoreDoc[]> hits = getHits(iSearcher,queries);
-            getResults(hits, iSearcher, name + "test.txt");
+            System.out.println("Searching.....");
+            getResults(hits, iSearcher, QUERY_RESULT_NAME + ".txt");
             directory.close();
  
         } catch (Exception e) {
