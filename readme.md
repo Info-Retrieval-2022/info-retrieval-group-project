@@ -9,17 +9,17 @@
 	• Build - build project
 	mvn package
 	
-	• Run -this will generate the top file: 'RUN5.txt'
-	 java -jar target/assignment_2-1.0-SNAPSHOT.jar
+	• Run -this will generate the top file: 'RUN7.txt'
+	 java -jar target/assignment_2-1.0-SNAPSHOT.jar 7
 	
 	• Trec evaluation
-	../../trec_eval/trec_eval qrel.txt RUN5.txt
+	../../trec_eval/trec_eval qrel.txt RUN7.txt
 	
 	
-1.to run the run5(best) setup and create index, use cmd:
-# java -jar target/assxx.jar 5 c 
-2.to run the run5(best) setup without create index, use cmd:
-# java -jar target/assxx.jar 5
+1.to run the run7(best) setup and create index, use cmd:
+# java -jar target/assxx.jar 7 c 
+2.to run the run7(best) setup without create index, use cmd:
+# java -jar target/assxx.jar 7
 or
 # java -jar target/assxx.jar 
 
