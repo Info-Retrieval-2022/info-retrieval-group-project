@@ -15,6 +15,7 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.*;
+import org.apache.lucene.search.BooleanQuery.Builder;
 import org.apache.lucene.search.similarities.BM25Similarity;
 import org.apache.lucene.search.similarities.BooleanSimilarity;
 import org.apache.lucene.search.similarities.ClassicSimilarity;
@@ -29,11 +30,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.ParseException;
+import java.util.*;
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import ie.tcd.docParser.*;
 
@@ -44,7 +47,7 @@ import ie.tcd.docParser.*;
 public class app {
 
     private static String INDEX_DIRECTORY = "index";
-
+    private static int run_choice = 1;
     static ScoreDoc[] queryIndex(int idx, ArrayList<BooleanQuery> queries, int num_hits, IndexSearcher iSearcher) throws IOException, ParseException {
         Directory directory = FSDirectory.open(Paths.get(INDEX_DIRECTORY));
         DirectoryReader iReader = DirectoryReader.open(directory);
@@ -55,10 +58,52 @@ public class app {
         return hits;
     }
 
+
+    public static List<String> StringSplitter(String text) {
+        text = text.replace("e.g."," ");
+        text = text.replace("i.e."," ");
+        text = text.replace("U.S. ","United States");
+        Pattern pattern = Pattern.compile("\\.|\\;");
+        Matcher matcher = pattern.matcher(text);
+
+        List<String> sentences = new ArrayList<>();
+        int start = 0;
+        while (matcher.find()) {
+            sentences.add(text.substring(start, matcher.start() + 1));
+            start = matcher.start() + 1;
+        }
+
+        return sentences;
+    }
+    public static List<String> getRelevant(String narr){
+
+        List<String> sentences = StringSplitter(narr);
+        List<String> relevantSentences = new ArrayList<>();
+        for (String sentence : sentences) {
+            if (!(sentence.toLowerCase().contains("not relevant"))&&!(sentence.toLowerCase().contains("irrelevant"))) {
+                sentence = sentence.replace(" relevant ", " ");
+                relevantSentences.add(sentence);
+            }
+        }
+        return relevantSentences;
+    }
+
+    public static List<String> getIrrelevant(String narr){
+        List<String> sentences = StringSplitter(narr);
+        List<String> irrelevantSentences = new ArrayList<>();
+        for (String sentence : sentences) {
+            if ((sentence.toLowerCase().contains("not relevant"))||(sentence.toLowerCase().contains("irrelevant"))){
+                sentence = sentence.replace(" not relevant ", " ");
+                irrelevantSentences.add(sentence);
+            }
+        }
+        return irrelevantSentences;
+    }
+
     // 1. Parses array list of queries and tokenizes each query using QueryParser
     public static ArrayList<ScoreDoc[]> getHits(IndexSearcher iSearcher, ArrayList<BooleanQuery>queries) throws IOException, ParseException, org.apache.lucene.queryparser.classic.ParseException {
-        int hitsperpage = 50;
- 
+        int hitsperpage = 1000;
+
         // For each parsed query, search the index, Store hits in an array of arrays "hits"
         ArrayList<ScoreDoc[]> hits = new ArrayList<>();
         for (int i = 0; i < 50; i++) {
@@ -81,9 +126,57 @@ public class app {
                 c++;
             }
         }
-        System.out.println("results file ready");
+        System.out.println("results file ready: "+ name);
         myWriter.close();
     }
+
+    public static String[] get_rel_list(String Title, String relevant) {
+        String[] rel = relevant.split("\\s+");
+        String[] tit = Title.split("\\s+");
+        String[] words = new String[rel.length + tit.length];
+        for (int i = 0; i < rel.length; i++) {
+            words[i] = rel[i].replaceAll("[^\\w]", "");
+        }
+
+        for (int i = rel.length; i < words.length; i++) {
+            words[i] = tit[i-rel.length].replaceAll("[^\\w]", "");
+        }
+        return words;
+    }
+
+    public static String trimIrrelevant(String Title, String relevant, String irrelevant){
+        String[] words = get_rel_list(Title, relevant);
+        for (String word : words) {
+            if (irrelevant.contains(word)) {
+                irrelevant = irrelevant.replace(" " + word + " ", " ");
+            }
+        }
+        irrelevant = irrelevant.replace("not relevant", " ");
+        return irrelevant;
+    }
+
+    public static String trimRelevant(String relevant){
+        if (relevant.contains(", not be")) {
+            relevant = StringUtils.substringBefore(relevant, ", not be");
+        }
+        if (relevant.contains(", not in")) {
+            relevant = StringUtils.substringBefore(relevant, ", not in");
+        }
+        if (relevant.contains(", not merely")) {
+            relevant = StringUtils.substringBefore(relevant, ", not merely");
+        }
+        if (relevant.contains("as opposed to")) {
+            relevant = StringUtils.substringBefore(relevant, "as opposed to");
+        }
+        if (relevant.contains("other than")){
+            String b4 = StringUtils.substringBefore(relevant, "other than");
+            String after = StringUtils.substringAfter(relevant, "in");
+            relevant = b4+after;
+        }
+        return relevant;
+    }
+
+
 
     /**
      * @param file
@@ -130,67 +223,115 @@ public class app {
             }
             title = title.delete(0,8);
             num = num.delete(0,15);
-			/* Run 1 */
-            String queryStr = title.toString()+" "+desc.toString()+" "+narr.toString();
-            /* Run 2 */
-            // String queryStr = title.toString()+" "+narr.toString();
-            
-            Map<String, Float> boost = new HashMap<>();
-            boost.put("headline", (float) 0.1);
-            boost.put("text", (float) 0.9);
+            String queryStrTitle = title.toString();
+            String queryStrDesc = desc.toString();
+            String queryStrNarr = narr.toString();
+            List<String> rels = getRelevant(queryStrNarr);
+            for (int i = 0; i< rels.size();i++){
+                rels.set(i, trimRelevant(rels.get(i)));
+            }
 
-            queryStr = queryStr.replace("/", "\\/");
+            List<String> irrels = getIrrelevant(queryStrNarr);
+            queryStrNarr = String.join(", ", rels);
+            String queryStrIrrel = String.join(", ", irrels);
+            queryStrIrrel = trimIrrelevant(queryStrTitle, queryStrNarr, queryStrIrrel);
+
+
+
+            Map<String, Float> boost = new HashMap<>();
+            boost.put("headline", 0.1f);
+            boost.put("text", 0.9f);
+
+            Map<String, Float> negboost = new HashMap<>();
+            negboost.put("headline", 0.05f);
+            negboost.put("text", 0.95f);
+
+            MultiFieldQueryParser negqueryParser = new MultiFieldQueryParser(new String[]{"headline", "text"}, analyzer, negboost);
+            negqueryParser.setAllowLeadingWildcard(true);
             MultiFieldQueryParser queryParser = new MultiFieldQueryParser(new String[]{"headline", "text"}, analyzer, boost);
             queryParser.setAllowLeadingWildcard(true);
-            Query query = queryParser.parse(queryStr);
-            BooleanQuery booleanQuery = new BooleanQuery.Builder().add(query, BooleanClause.Occur.SHOULD).build();
-            queries.add(booleanQuery);
-            string = reader.readLine();
+
+            Query queryTitle = queryParser.parse(QueryParser.escape(queryStrTitle));
+            Query queryDesc = queryParser.parse(QueryParser.escape(queryStrDesc));
+            BooleanQuery.Builder booleanQuery = new BooleanQuery.Builder();
+            booleanQuery.add(new BoostQuery(queryTitle,5f), BooleanClause.Occur.SHOULD);
+            booleanQuery.add(new BoostQuery(queryDesc,4f), BooleanClause.Occur.SHOULD);
+            if (queryStrNarr.length()>0) {
+                Query queryNarr = queryParser.parse(QueryParser.escape(queryStrNarr));
+                booleanQuery.add(new BoostQuery(queryNarr, 3f),BooleanClause.Occur.SHOULD);
             }
+
+            // Irrelevant prt of query hurting map currently- Can comment out this if.
+            // Exclude this query to score 0.3 for MAP
+//            if (queryStrIrrel.length()>0) {
+//                Query queryIrrel = negqueryParser.parse(QueryParser.escape(queryStrIrrel));
+//                booleanQuery.add(new BoostQuery(queryIrrel, 1f),BooleanClause.Occur.MUST_NOT);
+//            }
+            queries.add(booleanQuery.build());
+            string = reader.readLine();
+        }
+        //   System.out.println(queries);
         reader.close();
         return queries;
-        }
+    }
 
 
+
+    //    1.to run the run5(best) setup and create index, use cmd:
+//    # java -jar target/assxx.jar 5 c
+//    2.to run the run5(best) setup without create index, use cmd:
+//    # java -jar target/assxx.jar 5
+//    or
+//    # java -jar target/assxx.jar
     public static void main(String[] args) throws IOException {
 
         try {
-        	/* Run 1 */
-        	Analyzer analyzer = new EnglishAnalyzer(EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);
-        	/* Run 2 */
-//       	Analyzer analyzer = new StandardAnalyzer();
+            String QUERY_RESULT_NAME = "RUN5"; //default
+
+            if(args.length >=1) {
+                run_choice = Integer.parseInt(args[0]);
+                QUERY_RESULT_NAME = "RUN" + args[0];
+            }
+
+            /* Run 1 */
+            Analyzer analyzer = new EnglishAnalyzer(EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);
+            /* Run 2 */
+//        	Analyzer analyzer = new StandardAnalyzer();
             IndexWriterConfig config = new IndexWriterConfig(analyzer);
-            
+
             /* Run 1 */
             BM25Similarity bm25Similarity = new BM25Similarity();
-            String name = "BM25";
+
 //          config.setSimilarity(bm25Similarity);
             /* Run 2 */
             LMDirichletSimilarity LMDirichlet = new LMDirichletSimilarity();
             MultiSimilarity combined = new MultiSimilarity(new Similarity[]{bm25Similarity, LMDirichlet});
-            name = "combined";
+
             config.setSimilarity(combined);
             config.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
-            
             Directory directory = FSDirectory.open(Paths.get(INDEX_DIRECTORY));
-            IndexWriter iwriter = new IndexWriter(directory, config);
-            
-            System.out.println("PWD: " + System.getProperty("user.dir"));
-            
-            frparser.parseFR94("./Assignment Two/fr94", iwriter);
-            latimes_parser.loadLaTimesDocs("./Assignment Two/latimes", iwriter);  
-            ftLoader.parseFT("./Assignment Two/ft", iwriter);  
-            fbparser.parsefb("./Assignment Two/fbis", iwriter); 
-            iwriter.close();
-            
+
+            // Create Index optional
+            if((args.length >=2) && args[0].equals("c"))
+            {
+                IndexWriter iwriter = new IndexWriter(directory, config);
+                System.out.println("PWD: " + System.getProperty("user.dir"));
+                frparser.parseFR94("./Assignment Two/fr94", iwriter);
+                latimes_parser.loadLaTimesDocs("./Assignment Two/latimes", iwriter);
+                ftLoader.parseFT("./Assignment Two/ft", iwriter);
+                fbparser.parsefb("./Assignment Two/fbis", iwriter);
+                iwriter.close();
+            }
+
             File file = new File("./topics");
             ArrayList<BooleanQuery> queries = createQueries(file, analyzer);
-//          do a search if and only if indexes created successfully. 
+//          do a search if and only if indexes created successfully.
             DirectoryReader dReader = DirectoryReader.open(directory);
             IndexSearcher iSearcher = new IndexSearcher(dReader);
             iSearcher.setSimilarity(combined);
             ArrayList<ScoreDoc[]> hits = getHits(iSearcher,queries);
-            getResults(hits, iSearcher, name + "test.txt");
+            System.out.println("Searching.....");
+            getResults(hits, iSearcher, QUERY_RESULT_NAME + ".txt");
             directory.close();
 
         } catch (Exception e) {
