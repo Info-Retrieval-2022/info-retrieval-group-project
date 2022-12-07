@@ -26,7 +26,6 @@ public class latimes_parser {
         for (File file : allFiles) {
 
             org.jsoup.nodes.Document allContent = Jsoup.parse(file, null, "");
-            System.out.println("reading file: " + file.getName());
             Elements docs = allContent.select("DOC");
 
             for (Element doc : docs) {
@@ -37,9 +36,10 @@ public class latimes_parser {
                 text = (doc.select("TEXT").select("P").text());
               //  laDocs.add(createDocument(docNo, date, headline, text));
                 iwriter.addDocument(createDocument(docNo, date, headline, text));
+                System.out.println("Reading " + docNo);
             }
         }
-        System.out.println("Loading LATIMES Done!");
+        System.out.println("Parsing LATIMES Done...");
         return laDocs;
     }
 
@@ -48,10 +48,10 @@ public class latimes_parser {
     	
         org.apache.lucene.document.Document document = new org.apache.lucene.document.Document();
         document.add(new StringField("docno", docNo, Field.Store.YES));
-        document.add(new TextField("date", date, Field.Store.YES));
+   //     document.add(new TextField("date", date, Field.Store.YES));
         document.add(new TextField("headline", headline, Field.Store.YES));
         document.add(new TextField("text", text, Field.Store.YES));
-        document.add(new TextField("pub", publication, Field.Store.YES));
+   //     document.add(new TextField("pub", publication, Field.Store.YES));
         return document;
     }
 
