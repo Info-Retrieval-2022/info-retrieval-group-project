@@ -19,6 +19,12 @@ java -jar target/assignment_2-1.0-SNAPSHOT.jar 7 c
 To get the results file of the best run wihtout creating an index, run:
 
 ```
+java -jar target/assignment_2-1.0-SNAPSHOT.jar
+```
+
+OR
+
+```
 java -jar target/assignment_2-1.0-SNAPSHOT.jar 7
 ```
 
