@@ -47,7 +47,7 @@ import ie.tcd.docParser.*;
 public class app {
 
     private static String INDEX_DIRECTORY = "index";
-    private static int run_choice = 1;
+    private static int run_choice = 7;
     static ScoreDoc[] queryIndex(int idx, ArrayList<BooleanQuery> queries, int num_hits, IndexSearcher iSearcher) throws IOException, ParseException {
         Directory directory = FSDirectory.open(Paths.get(INDEX_DIRECTORY));
         DirectoryReader iReader = DirectoryReader.open(directory);
@@ -286,12 +286,14 @@ public class app {
     public static void main(String[] args) throws IOException {
 
         try {
-            String QUERY_RESULT_NAME = "RUN5"; //default
+            String QUERY_RESULT_NAME = "results"; //default
 
             if(args.length >=1) {
                 run_choice = Integer.parseInt(args[0]);
-                QUERY_RESULT_NAME = "RUN" + args[0];
-            }
+                if(run_choice!=7){
+		     QUERY_RESULT_NAME = "results" + args[0];
+            	}
+	    }
 
             /* Run 1 */
             Analyzer analyzer = new EnglishAnalyzer(EnglishAnalyzer.ENGLISH_STOP_WORDS_SET);
