@@ -13,13 +13,13 @@ mvn package
 To create an index and get the results file of the best run, run:
 
 ```
-java -jar target/assignment_2-1.0-SNAPSHOT.jar c
+java -jar target/assignment_2-1.0-SNAPSHOT.jar 7 c
 ```
 
 To get the results file of the best run wihtout creating an index, run:
 
 ```
-java -jar target/assignment_2-1.0-SNAPSHOT.jar
+java -jar target/assignment_2-1.0-SNAPSHOT.jar 7
 ```
 
 4. For Trec evaluation results, run:
