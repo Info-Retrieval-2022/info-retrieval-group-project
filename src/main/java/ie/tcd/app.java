@@ -312,7 +312,7 @@ public class app {
             Directory directory = FSDirectory.open(Paths.get(INDEX_DIRECTORY));
 
             // Create Index optional
-            if((args.length >=2) && args[0].equals("c"))
+            if((args.length >=2) && args[1].equals("c"))
             {
                 IndexWriter iwriter = new IndexWriter(directory, config);
                 System.out.println("PWD: " + System.getProperty("user.dir"));
